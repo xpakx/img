@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -7,13 +7,10 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./image.component.css']
 })
 export class ImageComponent implements OnInit {
-  id?: number;
+  @Input() id: number = 0;
 
-  constructor(private route: ActivatedRoute) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.id = params['id'];
-    });
   }
 }

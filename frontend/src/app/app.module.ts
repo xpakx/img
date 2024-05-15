@@ -7,6 +7,7 @@ import { GalleryComponent } from './gallery/gallery/gallery.component';
 import { ImageComponent } from './image/image/image.component';
 import { ModalComponent } from './image/modal/modal.component';
 import { MiddleDirective } from './utils/middle.directive';
+import { ImagePageComponent } from './image/image-page/image-page.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { MiddleDirective } from './utils/middle.directive';
     GalleryComponent,
     ImageComponent,
     ModalComponent,
-    MiddleDirective
+    MiddleDirective,
+    ImagePageComponent
   ],
   imports: [
     BrowserModule,

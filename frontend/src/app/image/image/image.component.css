@@ -1,0 +1,39 @@
+.container {
+    display: flex;
+    max-width: 871px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+}
+
+.photo {
+    flex: 1;
+}
+
+.photo img {
+    width: 100%;
+    object-fit: cover;
+}
+
+.details {
+    flex: 1;
+    padding: 10px;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.profile-link img {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.profile-link a {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
