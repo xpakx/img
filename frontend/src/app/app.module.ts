@@ -6,13 +6,15 @@ import { AppComponent } from './app.component';
 import { GalleryComponent } from './gallery/gallery/gallery.component';
 import { ImageComponent } from './image/image/image.component';
 import { ModalComponent } from './image/modal/modal.component';
+import { MiddleDirective } from './utils/middle.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     GalleryComponent,
     ImageComponent,
-    ModalComponent
+    ModalComponent,
+    MiddleDirective
   ],
   imports: [
     BrowserModule,
