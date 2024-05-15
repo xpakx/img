@@ -28,4 +28,9 @@ export class GalleryComponent implements OnInit {
     let url = `/profile/${this.username}/image/${id}`;
     window.open(url, "_blank");
   }
+
+  closeImage() {
+    this.idForImageModal = undefined;
+    this.location.replaceState(`/profile/${this.username}`);
+  }
 }

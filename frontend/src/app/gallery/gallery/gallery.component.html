@@ -2,6 +2,6 @@
 
 <div class="modal-overlay" *ngIf="idForImageModal">
     <div class="modal">
-        <app-modal [id]="idForImageModal"></app-modal>
+        <app-modal [id]="idForImageModal" (close)="closeImage()"></app-modal>
     </div>
 </div>
