@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { User } from '../dto/user';
+import { GalleryEvent } from '../dto/gallery-event';
 
 @Component({
   selector: 'app-gallery',
@@ -9,43 +10,23 @@ import { User } from '../dto/user';
   styleUrls: ['./gallery.component.css']
 })
 export class GalleryComponent implements OnInit {
-  username?: String;
-  idForImageModal?: number = undefined;
-  user: User = {
-    username: "Test",
-    followers: 180,
-    following: 260,
-    posts: 80,
-    description: "description description description description\n www.example.com",
-  }
+  @Input("choice") idForImageModal?: number = undefined;
+  @Output("action") actionEvent = new EventEmitter<GalleryEvent>();
 
-  constructor(private location: Location, private route: ActivatedRoute) { }
+  constructor() { }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.username = params['name'];
-    });
-    this.location.onUrlChange(url => this.closeImageOnChange(url));
   }
 
   openImage(id: number) {
-    this.idForImageModal = id;
-    this.location.go(`/profile/${this.username}/image/${id}`);
+    this.actionEvent.emit({id: id, type: "Open"});
   }
 
   openImageNew(id: number) {
-    let url = `/profile/${this.username}/image/${id}`;
-    window.open(url, "_blank");
+    this.actionEvent.emit({id: id, type: "OpenNew"});
   }
 
   closeImage() {
-    this.idForImageModal = undefined;
-    this.location.go(`/profile/${this.username}`);
-  }
-
-  closeImageOnChange(_url: String) {
-    if (this.location.isCurrentPathEqualTo(`/profile/${this.username}`)) {
-      this.idForImageModal = undefined;
-    }
+    this.actionEvent.emit({id: -1, type: "Close"});
   }
 }
