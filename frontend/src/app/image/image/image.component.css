@@ -37,3 +37,18 @@
     color: #000;
     font-weight: bold;
 }
+
+.actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.actions svg {
+    width: 24px;
+    height: 24px;
+    fill: #ffcc00;
+    stroke: #000;
+    stroke-width: 4;
+    cursor: pointer;
+}
