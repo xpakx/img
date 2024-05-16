@@ -21,7 +21,7 @@ export class GalleryComponent implements OnInit {
 
   openImage(id: number) {
     this.idForImageModal = id;
-    this.location.replaceState(`/profile/${this.username}/image/${id}`);
+    this.location.go(`/profile/${this.username}/image/${id}`);
   }
 
   openImageNew(id: number) {
@@ -31,6 +31,6 @@ export class GalleryComponent implements OnInit {
 
   closeImage() {
     this.idForImageModal = undefined;
-    this.location.replaceState(`/profile/${this.username}`);
+    this.location.go(`/profile/${this.username}`);
   }
 }
