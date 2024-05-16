@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { User } from '../dto/user';
 
 @Component({
   selector: 'app-gallery',
@@ -10,6 +11,13 @@ import { ActivatedRoute } from '@angular/router';
 export class GalleryComponent implements OnInit {
   username?: String;
   idForImageModal?: number = undefined;
+  user: User = {
+    username: "Test",
+    followers: 180,
+    following: 260,
+    posts: 80,
+    description: "description description description description\n www.example.com",
+  }
 
   constructor(private location: Location, private route: ActivatedRoute) { }
 
