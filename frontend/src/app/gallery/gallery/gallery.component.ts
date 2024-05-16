@@ -17,6 +17,7 @@ export class GalleryComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.username = params['name'];
     });
+    this.location.onUrlChange(url => this.closeImageOnChange(url));
   }
 
   openImage(id: number) {
@@ -32,5 +33,11 @@ export class GalleryComponent implements OnInit {
   closeImage() {
     this.idForImageModal = undefined;
     this.location.go(`/profile/${this.username}`);
+  }
+
+  closeImageOnChange(_url: String) {
+    if (this.location.isCurrentPathEqualTo(`/profile/${this.username}`)) {
+      this.idForImageModal = undefined;
+    }
   }
 }
