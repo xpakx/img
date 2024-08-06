@@ -1,8 +1,20 @@
-name: Test action
-run-name: ${{ github.actor }} is testing 
+name: Build
+run-name: building frontend
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Build-Frontend:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Hello from ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build 
