@@ -1,11 +1,11 @@
-name: Build
+name: Angular CI
 run-name: building frontend
 on: [push]
 jobs:
   Build-Frontend:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello from ${{ github.event_name }} event."
+      - run: echo "Frontend build triggered by ${{ github.event_name }} event."
       - name: Checkout the source code
         uses: actions/checkout@v4
       - name: Setup Node.js
