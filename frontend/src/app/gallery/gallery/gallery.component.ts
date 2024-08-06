@@ -1,7 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { User } from '../dto/user';
 import { GalleryEvent } from '../dto/gallery-event';
 
 @Component({
