@@ -7,6 +7,16 @@ on:
 jobs:
   Build-Backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: img-db
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - run: echo "Backend build triggered by ${{ github.event_name }} event."
       - name: Checkout the source code
@@ -19,6 +29,10 @@ jobs:
       - name: Run tests
         working-directory: ./main
         run: ./mvnw clean test
+        env:
+          SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/img-db
+          SPRING_DATASOURCE_USERNAME=postgres
+          SPRING_DATASOURCE_PASSWORD=postgres
       - name: Build
         working-directory: ./main
         run: ./mvnw clean compile
