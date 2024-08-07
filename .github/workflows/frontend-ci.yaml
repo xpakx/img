@@ -1,6 +1,11 @@
 name: Angular CI
 run-name: building frontend
-on: [push]
+on: 
+  push:
+    branches:
+      - master
+    paths:
+      - frontend/**
 jobs:
   Build-Frontend:
     runs-on: ubuntu-latest
