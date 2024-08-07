@@ -30,9 +30,9 @@ jobs:
         working-directory: ./main
         run: ./mvnw clean test
         env:
-          SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/img-db
-          SPRING_DATASOURCE_USERNAME=postgres
-          SPRING_DATASOURCE_PASSWORD=postgres
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/img-db
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
       - name: Build
         working-directory: ./main
         run: ./mvnw clean compile
