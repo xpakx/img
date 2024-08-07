@@ -1,0 +1,24 @@
+name: Spring CI
+run-name: building backend
+on: 
+  push:
+    branches:
+      - master
+jobs:
+  Build-Backend:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Backend build triggered by ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: '22'
+          distribution: 'corretto'
+      - name: Run tests
+        working-directory: ./main
+        run: ./mvnw clean test
+      - name: Build
+        working-directory: ./main
+        run: ./mvnw clean compile
