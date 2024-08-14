@@ -9,6 +9,20 @@ on:
 jobs:
   Build-Backend:
     runs-on: ubuntu-latest
+    steps:
+      - run: echo "Backend build triggered by ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: 'corretto'
+      - name: Build
+        working-directory: ./main
+        run: ./mvnw clean compile
+  Test-Backend:
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres
@@ -20,7 +34,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - run: echo "Backend build triggered by ${{ github.event_name }} event."
+      - run: echo "Backend tests triggered by ${{ github.event_name }} event."
       - name: Checkout the source code
         uses: actions/checkout@v4
       - name: Setup JDK
@@ -35,6 +49,14 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/img-db
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
+  Build-Docker:
+    runs-on: ubuntu-latest
+    needs: [Test-Backend, Build-Backend]
+    steps:
+      - run: echo "Dockerization triggered by ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
       - name: Build
-        working-directory: ./main
-        run: ./mvnw clean compile
+        uses: docker/build-push-action@v6
+        with:
+          push: false
