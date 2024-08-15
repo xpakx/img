@@ -58,7 +58,7 @@ jobs:
       - name: Checkout the source code
         uses: actions/checkout@v4
       - name: Build
-        working-directory: ./main
         uses: docker/build-push-action@v6
         with:
+          context: /main
           push: false
