@@ -3,9 +3,11 @@ package io.github.xpakx.images.account;
 import io.github.xpakx.images.account.dto.AuthenticationRequest;
 import io.github.xpakx.images.account.dto.AuthenticationResponse;
 import io.github.xpakx.images.account.dto.RegistrationRequest;
+import io.github.xpakx.images.account.dto.RefreshTokenRequest;
 import io.github.xpakx.images.account.error.AuthenticationException;
 import io.github.xpakx.images.account.error.ValidationException;
 import io.github.xpakx.images.security.jwt.JwtUtils;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -78,5 +80,29 @@ public class AuthService {
                 userDetails.getAuthorities().stream()
                         .anyMatch((a) -> a.getAuthority().equals("MODERATOR"))
             );
+    }
+
+    public AuthenticationResponse refresh(RefreshTokenRequest request) {
+        if(jwt.isInvalid(request.token())) {
+            return null;
+        }
+        Claims claims = jwt.getAllClaimsFromToken(request.token());
+        Boolean isRefreshToken = claims.get("refresh", Boolean.class);
+        if (Boolean.FALSE.equals(isRefreshToken)) {
+            return null;
+        }
+
+        var username = claims.getSubject();
+        final UserDetails userDetails = userService.loadUserByUsername(username);
+
+        final String token = jwt.generateToken(userDetails);
+        final String refreshToken = jwt.generateRefreshToken(username);
+        return new AuthenticationResponse(
+                token,
+                refreshToken,
+                username,
+                userDetails.getAuthorities().stream()
+                        .anyMatch((a) -> a.getAuthority().equals("MODERATOR"))
+                );
     }
 }

@@ -2,6 +2,7 @@ package io.github.xpakx.images.account;
 
 import io.github.xpakx.images.account.dto.AuthenticationRequest;
 import io.github.xpakx.images.account.dto.AuthenticationResponse;
+import io.github.xpakx.images.account.dto.RefreshTokenRequest;
 import io.github.xpakx.images.account.dto.RegistrationRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,14 @@ public class AuthController {
             @Valid @RequestBody AuthenticationRequest authenticationRequest) {
         return ResponseEntity.ok(
                 service.generateAuthenticationToken(authenticationRequest)
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(
+                service.refresh(request)
         );
     }
 }
