@@ -1,5 +1,6 @@
 package io.github.xpakx.images.account;
 
+import io.github.xpakx.images.account.dto.AuthenticationRequest;
 import io.github.xpakx.images.account.dto.AuthenticationResponse;
 import io.github.xpakx.images.account.dto.RegistrationRequest;
 import jakarta.validation.Valid;
@@ -21,6 +22,14 @@ public class AuthController {
         return new ResponseEntity<>(
                 service.register(registrationRequest),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @Valid @RequestBody AuthenticationRequest authenticationRequest) {
+        return ResponseEntity.ok(
+                service.generateAuthenticationToken(authenticationRequest)
         );
     }
 }

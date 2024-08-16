@@ -1,5 +1,6 @@
 package io.github.xpakx.images.account;
 
+import io.github.xpakx.images.account.dto.AuthenticationRequest;
 import io.github.xpakx.images.account.dto.AuthenticationResponse;
 import io.github.xpakx.images.account.dto.RegistrationRequest;
 import io.github.xpakx.images.account.error.AuthenticationException;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -62,5 +64,19 @@ public class AuthService {
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new ValidationException("Username exists!");
         }
+    }
+
+    public AuthenticationResponse generateAuthenticationToken(AuthenticationRequest authenticationRequest) {
+        final UserDetails userDetails = userService.loadUserByUsername(authenticationRequest.username());
+        authenticate(authenticationRequest.username(), authenticationRequest.password());
+        final String token = jwt.generateToken(userDetails);
+        final String refreshToken = jwt.generateRefreshToken(authenticationRequest.username());
+        return new AuthenticationResponse(
+                token,
+                refreshToken,
+                authenticationRequest.username(),
+                userDetails.getAuthorities().stream()
+                        .anyMatch((a) -> a.getAuthority().equals("MODERATOR"))
+            );
     }
 }
