@@ -83,7 +83,7 @@ class RegistrationRequestTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 4, 16, 20, 30, 40})
-    public void usernameOfIncorrectLengthShortUsernameShouldFailValidation(int usernameLength) {
+    public void usernameOfIncorrectLengthShouldFailValidation(int usernameLength) {
         var request = new RegistrationRequest(
                 createUsernameOfLength(usernameLength), "password", "password"
         );

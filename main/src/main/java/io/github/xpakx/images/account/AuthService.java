@@ -56,7 +56,7 @@ public class AuthService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
-            throw new AuthenticationException("User " +username+" disabled!");
+            throw new AuthenticationException("User " + username + " disabled!");
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("Invalid password!");
         }
@@ -84,12 +84,12 @@ public class AuthService {
 
     public AuthenticationResponse refresh(RefreshTokenRequest request) {
         if(jwt.isInvalid(request.token())) {
-            return null;
+            throw new ValidationException("JWT token is invalid");
         }
         Claims claims = jwt.getAllClaimsFromToken(request.token());
         Boolean isRefreshToken = claims.get("refresh", Boolean.class);
         if (Boolean.FALSE.equals(isRefreshToken)) {
-            return null;
+            throw new ValidationException("Must use refresh token");
         }
 
         var username = claims.getSubject();
