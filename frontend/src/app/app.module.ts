@@ -10,6 +10,8 @@ import { MiddleDirective } from './utils/middle.directive';
 import { ImagePageComponent } from './image/image-page/image-page.component';
 import { ProfileComponent } from './gallery/profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoginComponent } from './auth/login/login.component';
 
 @NgModule({
   declarations: [
@@ -19,12 +21,15 @@ import { HttpClientModule } from '@angular/common/http';
     ModalComponent,
     MiddleDirective,
     ImagePageComponent,
-    ProfileComponent
+    ProfileComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
