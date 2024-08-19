@@ -12,6 +12,7 @@ import { ProfileComponent } from './gallery/profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { LoginComponent } from './auth/login/login.component';
     ImagePageComponent,
     ProfileComponent,
     LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
