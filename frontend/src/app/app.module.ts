@@ -9,10 +9,11 @@ import { ModalComponent } from './image/modal/modal.component';
 import { MiddleDirective } from './utils/middle.directive';
 import { ImagePageComponent } from './image/image-page/image-page.component';
 import { ProfileComponent } from './gallery/profile/profile.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { ErrorInterceptor } from './error/error.interceptor';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,13 @@ import { RegisterComponent } from './auth/register/register.component';
     FormsModule,
     ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
