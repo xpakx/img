@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - frontend/**
+      - .github/workflows/frontend-ci.yaml
 jobs:
   Build-Frontend:
     runs-on: ubuntu-latest
@@ -20,9 +21,34 @@ jobs:
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
-      - name: Run tests
-        working-directory: ./frontend
-        run: npm run test:ci
       - name: Build
         working-directory: ./frontend
         run: npm run build 
+  Test-Frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Frontend tests triggered by ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm run test:ci
+  Build-Frontend-Docker:
+    runs-on: ubuntu-latest
+    needs: [Test-Frontend, Build-Frontend]
+    steps:
+      - run: echo "Frontend dockerization triggered by ${{ github.event_name }} event."
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
