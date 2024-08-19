@@ -9,6 +9,7 @@ import { ModalComponent } from './image/modal/modal.component';
 import { MiddleDirective } from './utils/middle.directive';
 import { ImagePageComponent } from './image/image-page/image-page.component';
 import { ProfileComponent } from './gallery/profile/profile.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ProfileComponent } from './gallery/profile/profile.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
