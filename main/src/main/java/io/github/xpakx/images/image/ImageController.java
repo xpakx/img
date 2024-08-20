@@ -4,6 +4,9 @@ import io.github.xpakx.images.image.dto.ImageData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,5 +21,11 @@ public class ImageController {
     @GetMapping("/user/{username}/images")
     public Page<ImageData> getImagesByUsername(@PathVariable String username, @RequestParam int page) {
         return service.getImagePage(username, page);
+    }
+
+    @PostMapping("/sound")
+    @ResponseBody
+    public List<ImageData> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+        return service.uploadImages(files);
     }
 }
