@@ -1,11 +1,13 @@
 package io.github.xpakx.images.image;
 
+import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.ImageNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -14,7 +16,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final Sqids sqids;
 
-    public Image getBySqId(String sqid) {
+    public ImageData getBySqId(String sqid) {
         List<Long> ids = sqids.decode(sqid);
 
         if(ids.size() != 1) {
@@ -22,6 +24,17 @@ public class ImageService {
         }
         return imageRepository
                 .findById(ids.getFirst())
+                .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+    }
+
+    private ImageData imageToDto(Image image) {
+        String id = sqids.encode(Collections.singletonList(image.getId()));
+        return new ImageData(
+                id,
+                image.getImageUrl(),
+                image.getCaption(),
+                image.getCreatedAt()
+        );
     }
 }
