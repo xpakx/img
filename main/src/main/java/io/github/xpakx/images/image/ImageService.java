@@ -4,6 +4,10 @@ import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.ImageNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
@@ -36,5 +40,12 @@ public class ImageService {
                 image.getCaption(),
                 image.getCreatedAt()
         );
+    }
+
+    public Page<ImageData> getImagePage(String username, int page) {
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return imageRepository
+                .findByUserUsername(username, pageable)
+                .map(this::imageToDto);
     }
 }
