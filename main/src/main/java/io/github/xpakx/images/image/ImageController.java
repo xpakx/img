@@ -23,7 +23,7 @@ public class ImageController {
         return service.getImagePage(username, page);
     }
 
-    @PostMapping("/sound")
+    @PostMapping("/image")
     @ResponseBody
     public List<ImageData> uploadFiles(@RequestParam("files") MultipartFile[] files) {
         return service.uploadImages(files);

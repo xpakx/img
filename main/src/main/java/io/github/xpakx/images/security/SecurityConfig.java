@@ -67,10 +67,11 @@ public class SecurityConfig {
                 .addFilterAfter(jwtRequestFilter, ExceptionTranslationFilter.class);
         return http.build();
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:8001"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("*"));
