@@ -2,12 +2,15 @@
     <div class="header-container">
         <div class="logo">Images</div>
         <input type="text" placeholder="Search">
-        <div class="header-icons">
+        <div class="header-icons" *ngIf="logged">
             <a href="#" class="icon">🏠</a>
             <a href="#" class="icon">✉️</a>
             <a href="#" class="icon">➕</a>
             <a href="#" class="icon">❤️</a>
             <a href="#" class="icon">👤</a>
+        </div>
+        <div class="header-icons" *ngIf="!logged">
+            <a routerLink="/login" class="icon">🔑</a>
         </div>
     </div>
 </header>
