@@ -1,5 +1,6 @@
 package io.github.xpakx.images.image;
 
+import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
@@ -24,6 +25,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ImageService {
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
     private final Sqids sqids;
 
     public ImageData getBySqId(String sqid) {
@@ -55,27 +57,30 @@ public class ImageService {
                 .map(this::imageToDto);
     }
 
-    public List<ImageData> uploadImages(MultipartFile[] files) {
+    public List<ImageData> uploadImages(MultipartFile[] files, String username) {
+        var user = userRepository.findByUsername(username).orElseThrow();
         List<Result<String>> results = Arrays
                 .stream(files)
                 .map(this::trySave)
                 .toList();
+        System.out.println(results);
         return imageRepository.saveAll(
                 results
                         .stream()
                         .filter(Result::isOk)
                         .map(Result::unwrap)
-                        .map(this::toImageEntity)
+                        .map((image) -> toImageEntity(image, user.getId()))
                         .toList()
         ).stream()
                 .map(this::imageToDto)
                 .toList();
     }
 
-    private Image toImageEntity(String name) {
+    private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
         //TODO: add correct user; make image private before editing caption etc.?
         image.setImageUrl("/api" + name);
+        image.setUser(userRepository.getReferenceById(userId));
         return image;
     }
 

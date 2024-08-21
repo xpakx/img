@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -25,7 +26,7 @@ public class ImageController {
 
     @PostMapping("/image")
     @ResponseBody
-    public List<ImageData> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-        return service.uploadImages(files);
+    public List<ImageData> uploadFiles(@RequestParam("files") MultipartFile[] files, Principal principal) {
+        return service.uploadImages(files, principal.getName());
     }
 }
