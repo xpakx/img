@@ -85,7 +85,7 @@ public class ImageService {
         }
         // TODO: better file structure and check mimetype
 
-        Path root = Path.of("/uploads");
+        Path root = Path.of("uploads");
         String name = file.getOriginalFilename();
         try {
             if (!Files.exists(root)) {
