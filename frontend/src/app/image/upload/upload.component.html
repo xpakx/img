@@ -1,0 +1,8 @@
+<input class="hidden" type="file" (change)="selectFile($event)" multiple="multiple" #fileselection>
+<button class="option-button" (click)="openFileSelection()">
+    Select file…
+</button>
+
+<button class="option-button option-button-red" (click)="send()"  [disabled]="!files">
+    Send
+</button>
