@@ -1,0 +1,32 @@
+.hidden {
+  display: none;
+}
+
+.option-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+  transition: background-color 0.3s;
+}
+
+.option-button:hover {
+  background-color: #45a049;
+}
+
+.option-button-red {
+  background-color: #f44336;
+}
+
+.option-button-red:hover {
+  background-color: #e53935;
+}
+
+.option-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
