@@ -7,6 +7,12 @@ on:
     paths:
       - main/**
       - .github/workflows/backend-ci.yaml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - main/**
+      - .github/workflows/backend-ci.yaml
 jobs:
   Build-Backend:
     runs-on: ubuntu-latest

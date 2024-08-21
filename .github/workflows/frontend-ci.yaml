@@ -7,6 +7,12 @@ on:
     paths:
       - frontend/**
       - .github/workflows/frontend-ci.yaml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - frontend/**
+      - .github/workflows/frontend-ci.yaml
 jobs:
   Build-Frontend:
     runs-on: ubuntu-latest
