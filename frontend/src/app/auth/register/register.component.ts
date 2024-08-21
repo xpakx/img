@@ -50,6 +50,7 @@ export class RegisterComponent implements OnInit {
     this.error = false;
     localStorage.setItem('token', response.token.toString());
     localStorage.setItem('username', response.username.toString());
+    localStorage.setItem('refresh', response.refresh_token.toString());
   }
 
   onError(err: HttpErrorResponse) {
