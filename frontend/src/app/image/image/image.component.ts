@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-image',
@@ -7,7 +8,8 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./image.component.css']
 })
 export class ImageComponent implements OnInit {
-  @Input() id: number = 0;
+  @Input() id: String = "";
+  apiUrl: String = environment.apiUrl;
 
   constructor() { }
 

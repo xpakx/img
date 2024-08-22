@@ -3,6 +3,10 @@ import { User } from '../dto/user';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { GalleryEvent } from '../dto/gallery-event';
+import { ProfileService } from 'src/app/profile/profile.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Page } from '../dto/page';
+import { Image } from '../dto/image';
 
 @Component({
   selector: 'app-profile',
@@ -11,30 +15,37 @@ import { GalleryEvent } from '../dto/gallery-event';
 })
 export class ProfileComponent implements OnInit {
   username?: String;
-  idForImageModal?: number = undefined;
-  user: User = {
-    username: "Test",
-    followers: 180,
-    following: 260,
-    posts: 80,
-    description: "description description description description\n www.example.com",
-  }
+  idForImageModal?: String = undefined;
+  user?: User;
+  images: Image[] = [];
 
-  constructor(private location: Location, private route: ActivatedRoute) { }
+  constructor(private location: Location, private route: ActivatedRoute, private profileService: ProfileService) { }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.username = params['name'];
+      if(this.username) this.loadProfile(this.username);
     });
     this.location.onUrlChange(url => this.closeImageOnChange(url));
   }
 
-  openImage(id: number) {
+  loadProfile(username: String): void {
+    this.profileService.getProfile(username).subscribe({
+      next: (response: User) => this.user = response,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+    this.profileService.getImages(username).subscribe({
+      next: (response: Page<Image>) => this.images = response.content,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  openImage(id: String) {
     this.idForImageModal = id;
     this.location.go(`/profile/${this.username}/image/${id}`);
   }
 
-  openImageNew(id: number) {
+  openImageNew(id: String) {
     let url = `/profile/${this.username}/image/${id}`;
     window.open(url, "_blank");
   }
@@ -51,9 +62,9 @@ export class ProfileComponent implements OnInit {
   }
 
   onGalleryEvent(event: GalleryEvent) {
-    if (event.type == "Open") {
+    if (event.type == "Open" && event.id) {
       this.openImage(event.id);
-    } else if (event.type == "OpenNew") {
+    } else if (event.type == "OpenNew" && event.id) {
       this.openImageNew(event.id);
     } else if (event.type == "Close") {
       this.closeImage();

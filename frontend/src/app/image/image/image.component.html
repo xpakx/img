@@ -1,6 +1,6 @@
 <div class="container">
     <div class="photo">
-        <img src="https://loremflickr.com/640/480?lock={{id}}">
+      <img [src]="apiUrl + '/image/' + id + '/file'">
     </div>
     <div class="details">
         <div class="profile-link">
