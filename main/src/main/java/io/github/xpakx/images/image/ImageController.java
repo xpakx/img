@@ -41,4 +41,9 @@ public class ImageController {
                 .contentType(resource.type())
                 .body(resource.resource());
     }
+
+    @DeleteMapping("/image/{id}")
+    public void deleteImage(@PathVariable String id, Principal principal) {
+        service.deleteImage(id, principal.getName());
+    }
 }

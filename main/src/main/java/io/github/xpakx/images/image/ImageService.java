@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.sqids.Sqids;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -134,5 +133,28 @@ public class ImageService {
         } catch (IOException e) {
             throw new RuntimeException("Cannot load file");
         }
+    }
+
+    public void deleteImage(String imageId, String username) {
+        var user = userRepository.findByUsername(username).orElseThrow();
+
+        List<Long> ids = sqids.decode(imageId);
+
+        if(ids.size() != 1) {
+            throw new IdCorruptedException("Id corrupted");
+        }
+
+        Long id = ids.getFirst();
+
+        String imageOwner = imageRepository
+                .findById(ids.getFirst())
+                .map((img) -> img.getUser().getUsername())
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+
+        if(!user.getUsername().equals(imageOwner)) {
+            throw new RuntimeException("Not an owner");
+        }
+
+        imageRepository.deleteById(id);
     }
 }
