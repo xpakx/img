@@ -4,8 +4,7 @@ import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
-import io.github.xpakx.images.image.error.IdCorruptedException;
-import io.github.xpakx.images.image.error.ImageNotFoundException;
+import io.github.xpakx.images.image.error.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -59,7 +58,8 @@ public class ImageService {
     }
 
     public List<ImageData> uploadImages(MultipartFile[] files, String username) {
-        var user = userRepository.findByUsername(username).orElseThrow();
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
         List<Result<String>> results = Arrays
                 .stream(files)
                 .map(this::trySave)
@@ -87,7 +87,7 @@ public class ImageService {
 
     private Result<String> trySave(MultipartFile file) {
         if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
-            return new Result.Err<>(new RuntimeException("Filename cannot be empty!"));
+            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
         }
         // TODO: better file structure and check mimetype
 
@@ -99,7 +99,7 @@ public class ImageService {
             }
             Files.copy(file.getInputStream(), root.resolve(name));
         } catch (Exception e) {
-            return new Result.Err<>(new RuntimeException("Could not store the file"));
+            return new Result.Err<>(new CouldNotStoreException("Could not store the file"));
         }
         return new Result.Ok<>(name);
     }
@@ -119,16 +119,17 @@ public class ImageService {
             MediaType type = switch (typeString) {
                 case "image/jpeg" -> MediaType.IMAGE_JPEG;
                 case "image/png" -> MediaType.IMAGE_PNG;
-                default -> throw  new RuntimeException("Incorrect filetype");
+                default -> throw  new CannotLoadFileException("Incorrect filetype");
             };
             return new ResourceResult(resource, type);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot load file");
+            throw new CannotLoadFileException("Cannot load file");
         }
     }
 
     public void deleteImage(String imageId, String username) {
-        var user = userRepository.findByUsername(username).orElseThrow();
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
 
         Long id = transformToId(imageId);
         String imageOwner = imageRepository
@@ -137,7 +138,7 @@ public class ImageService {
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
         if(!user.getUsername().equals(imageOwner)) {
-            throw new RuntimeException("Not an owner");
+            throw new NotAnOwnerException("Not an owner");
         }
 
         imageRepository.deleteById(id);
