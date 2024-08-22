@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GalleryEvent } from '../dto/gallery-event';
+import { Image } from '../dto/image';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-gallery',
@@ -7,23 +9,25 @@ import { GalleryEvent } from '../dto/gallery-event';
   styleUrls: ['./gallery.component.css']
 })
 export class GalleryComponent implements OnInit {
-  @Input("choice") idForImageModal?: number = undefined;
+  @Input("choice") idForImageModal?: String = undefined;
   @Output("action") actionEvent = new EventEmitter<GalleryEvent>();
+  @Input("images") images: Image[] = [];
+  apiUrl = environment.apiUrl;
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  openImage(id: number) {
+  openImage(id: String) {
     this.actionEvent.emit({id: id, type: "Open"});
   }
 
-  openImageNew(id: number) {
+  openImageNew(id: String) {
     this.actionEvent.emit({id: id, type: "OpenNew"});
   }
 
   closeImage() {
-    this.actionEvent.emit({id: -1, type: "Close"});
+    this.actionEvent.emit({id: undefined, type: "Close"});
   }
 }

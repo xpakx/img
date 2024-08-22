@@ -7,7 +7,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./image-page.component.css']
 })
 export class ImagePageComponent implements OnInit {
-  id?: number;
+  id?: String;
 
   constructor(private route: ActivatedRoute) { }
 

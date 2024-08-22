@@ -1,4 +1,4 @@
 export interface GalleryEvent {
-    id: number,
+    id?: String,
     type: "Open" | "OpenNew" | "Close",
 }
