@@ -80,7 +80,7 @@ public class ImageService {
     private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
         //TODO: make image private before editing caption etc.?
-        image.setImageUrl(name);
+        image.setImageUrl("uploads/" + name);
         image.setUser(userRepository.getReferenceById(userId));
         return image;
     }
