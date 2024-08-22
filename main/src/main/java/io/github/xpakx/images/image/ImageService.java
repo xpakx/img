@@ -34,14 +34,10 @@ public class ImageService {
     private final UserRepository userRepository;
     private final Sqids sqids;
 
-    public ImageData getBySqId(String sqid) {
-        List<Long> ids = sqids.decode(sqid);
-
-        if(ids.size() != 1) {
-            throw new IdCorruptedException("Id corrupted");
-        }
+    public ImageData getBySqId(String sqId) {
+        Long id = transformToId(sqId);
         return imageRepository
-                .findById(ids.getFirst())
+                .findById(id)
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
     }
@@ -108,15 +104,11 @@ public class ImageService {
         return new Result.Ok<>(name);
     }
 
-    public ResourceResult getImage(String id) {
-        List<Long> ids = sqids.decode(id);
-
-        if(ids.size() != 1) {
-            throw new IdCorruptedException("Id corrupted");
-        }
+    public ResourceResult getImage(String sqId) {
+        Long id = transformToId(sqId);
 
         String url = imageRepository
-                .findById(ids.getFirst())
+                .findById(id)
                 .map(Image::getImageUrl)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
@@ -138,16 +130,9 @@ public class ImageService {
     public void deleteImage(String imageId, String username) {
         var user = userRepository.findByUsername(username).orElseThrow();
 
-        List<Long> ids = sqids.decode(imageId);
-
-        if(ids.size() != 1) {
-            throw new IdCorruptedException("Id corrupted");
-        }
-
-        Long id = ids.getFirst();
-
+        Long id = transformToId(imageId);
         String imageOwner = imageRepository
-                .findById(ids.getFirst())
+                .findById(id)
                 .map((img) -> img.getUser().getUsername())
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
@@ -156,5 +141,14 @@ public class ImageService {
         }
 
         imageRepository.deleteById(id);
+    }
+
+    private Long transformToId(String imageId) {
+        List<Long> ids = sqids.decode(imageId);
+
+        if(ids.size() != 1) {
+            throw new IdCorruptedException("Id corrupted");
+        }
+        return ids.getFirst();
     }
 }
