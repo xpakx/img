@@ -44,7 +44,6 @@ public class ImageService {
         String id = sqids.encode(Collections.singletonList(image.getId()));
         return new ImageData(
                 id,
-                image.getImageUrl(),
                 image.getCaption(),
                 image.getCreatedAt()
         );
@@ -78,8 +77,8 @@ public class ImageService {
 
     private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
-        //TODO: add correct user; make image private before editing caption etc.?
-        image.setImageUrl("/api" + name);
+        //TODO: make image private before editing caption etc.?
+        image.setImageUrl(name);
         image.setUser(userRepository.getReferenceById(userId));
         return image;
     }
