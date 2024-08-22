@@ -1,21 +1,26 @@
 package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
-import io.github.xpakx.images.image.error.IdCorruptedException;
-import io.github.xpakx.images.image.error.ImageNotFoundException;
+import io.github.xpakx.images.image.error.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.sqids.Sqids;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,14 +33,10 @@ public class ImageService {
     private final UserRepository userRepository;
     private final Sqids sqids;
 
-    public ImageData getBySqId(String sqid) {
-        List<Long> ids = sqids.decode(sqid);
-
-        if(ids.size() != 1) {
-            throw new IdCorruptedException("Id corrupted");
-        }
+    public ImageData getBySqId(String sqId) {
+        Long id = transformToId(sqId);
         return imageRepository
-                .findById(ids.getFirst())
+                .findById(id)
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
     }
@@ -44,7 +45,6 @@ public class ImageService {
         String id = sqids.encode(Collections.singletonList(image.getId()));
         return new ImageData(
                 id,
-                image.getImageUrl(),
                 image.getCaption(),
                 image.getCreatedAt()
         );
@@ -58,7 +58,8 @@ public class ImageService {
     }
 
     public List<ImageData> uploadImages(MultipartFile[] files, String username) {
-        var user = userRepository.findByUsername(username).orElseThrow();
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
         List<Result<String>> results = Arrays
                 .stream(files)
                 .map(this::trySave)
@@ -78,15 +79,15 @@ public class ImageService {
 
     private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
-        //TODO: add correct user; make image private before editing caption etc.?
-        image.setImageUrl("/api" + name);
+        //TODO: make image private before editing caption etc.?
+        image.setImageUrl(name);
         image.setUser(userRepository.getReferenceById(userId));
         return image;
     }
 
     private Result<String> trySave(MultipartFile file) {
         if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
-            return new Result.Err<>(new RuntimeException("Filename cannot be empty!"));
+            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
         }
         // TODO: better file structure and check mimetype
 
@@ -98,8 +99,57 @@ public class ImageService {
             }
             Files.copy(file.getInputStream(), root.resolve(name));
         } catch (Exception e) {
-            return new Result.Err<>(new RuntimeException("Could not store the file"));
+            return new Result.Err<>(new CouldNotStoreException("Could not store the file"));
         }
         return new Result.Ok<>(name);
+    }
+
+    public ResourceResult getImage(String sqId) {
+        Long id = transformToId(sqId);
+
+        String url = imageRepository
+                .findById(id)
+                .map(Image::getImageUrl)
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+
+        Path path = Paths.get(url);
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            String typeString = Files.probeContentType(path);
+            MediaType type = switch (typeString) {
+                case "image/jpeg" -> MediaType.IMAGE_JPEG;
+                case "image/png" -> MediaType.IMAGE_PNG;
+                default -> throw  new CannotLoadFileException("Incorrect filetype");
+            };
+            return new ResourceResult(resource, type);
+        } catch (IOException e) {
+            throw new CannotLoadFileException("Cannot load file");
+        }
+    }
+
+    public void deleteImage(String imageId, String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        Long id = transformToId(imageId);
+        String imageOwner = imageRepository
+                .findById(id)
+                .map((img) -> img.getUser().getUsername())
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+
+        if(!user.getUsername().equals(imageOwner)) {
+            throw new NotAnOwnerException("Not an owner");
+        }
+
+        imageRepository.deleteById(id);
+    }
+
+    private Long transformToId(String imageId) {
+        List<Long> ids = sqids.decode(imageId);
+
+        if(ids.size() != 1) {
+            throw new IdCorruptedException("Id corrupted");
+        }
+        return ids.getFirst();
     }
 }
