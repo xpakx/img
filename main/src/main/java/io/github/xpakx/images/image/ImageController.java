@@ -1,8 +1,12 @@
 package io.github.xpakx.images.image;
 
+import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.image.dto.ImageData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,5 +32,13 @@ public class ImageController {
     @ResponseBody
     public List<ImageData> uploadFiles(@RequestParam("files") MultipartFile[] files, Principal principal) {
         return service.uploadImages(files, principal.getName());
+    }
+
+    @GetMapping("/image/{id}/file")
+    public ResponseEntity<Resource> getImage(@PathVariable String id) {
+        ResourceResult resource = service.getImage(id);
+        return ResponseEntity.ok()
+                .contentType(resource.type())
+                .body(resource.resource());
     }
 }

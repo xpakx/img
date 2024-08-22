@@ -1,21 +1,28 @@
 package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.ImageNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.sqids.Sqids;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -100,5 +107,32 @@ public class ImageService {
             return new Result.Err<>(new RuntimeException("Could not store the file"));
         }
         return new Result.Ok<>(name);
+    }
+
+    public ResourceResult getImage(String id) {
+        List<Long> ids = sqids.decode(id);
+
+        if(ids.size() != 1) {
+            throw new IdCorruptedException("Id corrupted");
+        }
+
+        String url = imageRepository
+                .findById(ids.getFirst())
+                .map(Image::getImageUrl)
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+
+        Path path = Paths.get(url);
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            String typeString = Files.probeContentType(path);
+            MediaType type = switch (typeString) {
+                case "image/jpeg" -> MediaType.IMAGE_JPEG;
+                case "image/png" -> MediaType.IMAGE_PNG;
+                default -> throw  new RuntimeException("Incorrect filetype");
+            };
+            return new ResourceResult(resource, type);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot load file");
+        }
     }
 }
