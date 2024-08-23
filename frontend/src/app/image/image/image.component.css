@@ -47,8 +47,12 @@
 .actions svg {
     width: 24px;
     height: 24px;
-    fill: #ffcc00;
     stroke: #000;
+    fill: none;
     stroke-width: 4;
     cursor: pointer;
+}
+
+.actions svg.liked {
+    fill: #ffcc00;
 }

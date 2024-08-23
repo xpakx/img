@@ -11,15 +11,28 @@ import { environment } from 'src/environments/environment';
 export class ImageComponent implements OnInit {
   @Input() id: String = "";
   apiUrl: String = environment.apiUrl;
+  liked: boolean = true;
 
   constructor(private likeService: LikeService) { }
 
   ngOnInit(): void {
   }
 
+  likeClick(): void {
+    if(this.liked) this.unlike();
+    else this.like();
+  }
+
   like(): void {
     this.likeService.like(this.id).subscribe({
-      next: (response: any) => console.log("liked"),
+      next: (_response: any) => this.liked = true,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  unlike(): void {
+    this.likeService.unlike(this.id).subscribe({
+      next: (_response: any) => this.liked = false,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }

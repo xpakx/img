@@ -9,7 +9,7 @@
         </div>
 
         <div class="actions">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" (click)="like()">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" (click)="likeClick()" [class.liked]="liked">
                 <title>Like</title>
                 <path d="M32 58s26-17 26-34c0-8-6-14-14-14s-12 8-12 8-4-8-12-8-14 6-14 14c0 17 26 34 26 34z" />
             </svg>
