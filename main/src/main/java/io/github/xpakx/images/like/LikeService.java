@@ -6,10 +6,12 @@ import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.like.dto.ImageLikes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class LikeService {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final Sqids sqids;
+    private final CacheManager cacheManager;
 
     public void likeImage(String username, String imageSqId) {
         Long imageId = transformToId(imageSqId);
@@ -42,6 +45,7 @@ public class LikeService {
         like.setImage(imageRepository.getReferenceById(imageId));
 
         likeRepository.save(like);
+        updateLikeCountCache(imageId, 1);
     }
 
     private Long transformToId(String imageId) {
@@ -60,11 +64,26 @@ public class LikeService {
         Like like = likeRepository.findByUserIdAndImageId(user.getId(), imageId)
                 .orElseThrow(() -> new RuntimeException("Like not found."));
         likeRepository.delete(like);
+        updateLikeCountCache(imageId, -1);
     }
 
     public ImageLikes getLikeCount(String imageSqId) {
         Long imageId = transformToId(imageSqId);
         var likes = likeRepository.countByImageId(imageId);
         return new ImageLikes(likes);
+    }
+
+    private void updateLikeCountCache(Long imageId, int delta) {
+        var cache = cacheManager.getCache("likeCountCache");
+        if (cache != null) {
+            Long currentLikeCount = cache.get(imageId, Long.class);
+            cache.put(
+                    imageId,
+                    Objects.requireNonNullElseGet(
+                            currentLikeCount,
+                            () -> likeRepository.countByImageId(imageId)
+                    ) + delta
+            );
+        }
     }
 }
