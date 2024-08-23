@@ -2,6 +2,7 @@ package io.github.xpakx.images.like;
 
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.image.ImageRepository;
+import io.github.xpakx.images.image.ImageService;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,18 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
+    private final ImageService imageService;
     private final Sqids sqids;
 
     public void likeImage(String username, String imageSqId) {
         Long imageId = transformToId(imageSqId);
+        var image = imageService.getBySqId(imageSqId);
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
+
+        if (image.author().equals(username)) {
+            throw new RuntimeException("Cannot like own images.");
+        }
 
         if (likeRepository.existsByUserIdAndImageId(user.getId(), imageId)) {
             throw new RuntimeException("User has already liked this image.");
