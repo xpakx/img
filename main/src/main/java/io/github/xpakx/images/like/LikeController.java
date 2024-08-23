@@ -1,7 +1,5 @@
 package io.github.xpakx.images.like;
 
-import io.github.xpakx.images.account.dto.RegistrationRequest;
-import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.like.dto.LikeRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,14 @@ public class LikeController {
             @Valid @RequestBody LikeRequest likeRequest,
             Principal principal) {
         service.likeImage(likeRequest.imageId(), principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/likes/images/{imageId}")
+    public ResponseEntity<Object> unlike(
+            @PathVariable String imageId,
+            Principal principal) {
+        service.unlikeImage(imageId, principal.getName());
         return ResponseEntity.ok().build();
     }
 }

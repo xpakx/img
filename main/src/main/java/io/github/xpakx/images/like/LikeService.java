@@ -49,4 +49,13 @@ public class LikeService {
         }
         return ids.getFirst();
     }
+
+    public void unlikeImage(String username, String imageSqId) {
+        Long imageId = transformToId(imageSqId);
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+        Like like = likeRepository.findByUserIdAndImageId(user.getId(), imageId)
+                .orElseThrow(() -> new RuntimeException("Like not found."));
+        likeRepository.delete(like);
+    }
 }
