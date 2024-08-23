@@ -8,4 +8,6 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByUserIdAndImageId(Long userId, Long imageId);
 
     Optional<Like> findByUserIdAndImageId(Long userId, Long imageId);
+
+    long countByImageId(Long imageId);
 }

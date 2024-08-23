@@ -5,6 +5,7 @@ import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.ImageService;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
+import io.github.xpakx.images.like.dto.ImageLikes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
@@ -60,5 +61,11 @@ public class LikeService {
         Like like = likeRepository.findByUserIdAndImageId(user.getId(), imageId)
                 .orElseThrow(() -> new RuntimeException("Like not found."));
         likeRepository.delete(like);
+    }
+
+    public ImageLikes getLikeCount(String imageSqId) {
+        Long imageId = transformToId(imageSqId);
+        var likes = likeRepository.countByImageId(imageId);
+        return new ImageLikes(likes);
     }
 }

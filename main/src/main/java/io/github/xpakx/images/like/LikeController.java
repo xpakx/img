@@ -1,5 +1,7 @@
 package io.github.xpakx.images.like;
 
+import io.github.xpakx.images.image.dto.ImageData;
+import io.github.xpakx.images.like.dto.ImageLikes;
 import io.github.xpakx.images.like.dto.LikeRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +29,10 @@ public class LikeController {
             Principal principal) {
         service.unlikeImage(imageId, principal.getName());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/image/{id}/likes")
+    public ImageLikes getImageById(@PathVariable String id) {
+        return service.getLikeCount(id);
     }
 }
