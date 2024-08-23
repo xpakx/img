@@ -23,4 +23,8 @@ export class LikeService {
   public unlike(imageId: String): Observable<any> {
     return this.http.delete<any>(`${this.apiServerUrl}/likes/images/${imageId}`, { headers: this.getHeaders() });
   }
+
+  public getLikes(imageId: String): Observable<{likes: number}> {
+    return this.http.get<{likes: number}>(`${this.apiServerUrl}/image/${imageId}/likes`, { headers: this.getHeaders() });
+  }
 }

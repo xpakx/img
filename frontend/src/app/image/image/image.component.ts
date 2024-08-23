@@ -12,10 +12,15 @@ export class ImageComponent implements OnInit {
   @Input() id: String = "";
   apiUrl: String = environment.apiUrl;
   liked: boolean = true;
+  likes: number = 0;
 
   constructor(private likeService: LikeService) { }
 
   ngOnInit(): void {
+    this.likeService.getLikes(this.id).subscribe({
+      next: (response: {likes: number}) => this.likes = response.likes,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
   }
 
   likeClick(): void {
