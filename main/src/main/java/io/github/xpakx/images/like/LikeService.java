@@ -3,8 +3,12 @@ package io.github.xpakx.images.like;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.error.IdCorruptedException;
+import io.github.xpakx.images.image.error.ImageNotFoundException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.like.dto.ImageLikes;
+import io.github.xpakx.images.like.error.ImageOwnerException;
+import io.github.xpakx.images.like.error.LikeExistsException;
+import io.github.xpakx.images.like.error.LikeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
@@ -27,17 +31,17 @@ public class LikeService {
         var imageAuthor = imageRepository
                 .findById(imageId)
                 .map((img) -> img.getUser().getUsername())
-                .orElseThrow();
+                .orElseThrow(() -> new ImageNotFoundException("Image not found."));
 
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
         if (imageAuthor.equals(username)) {
-            throw new RuntimeException("Cannot like own images.");
+            throw new ImageOwnerException("Cannot like own images.");
         }
 
         if (likeRepository.existsByUserIdAndImageId(user.getId(), imageId)) {
-            throw new RuntimeException("User has already liked this image.");
+            throw new LikeExistsException("User has already liked this image.");
         }
 
         Like like = new Like();
@@ -62,7 +66,7 @@ public class LikeService {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
         Like like = likeRepository.findByUserIdAndImageId(user.getId(), imageId)
-                .orElseThrow(() -> new RuntimeException("Like not found."));
+                .orElseThrow(() -> new LikeNotFoundException("Like not found."));
         likeRepository.delete(like);
         updateLikeCountCache(imageId, -1);
     }
