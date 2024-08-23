@@ -2,7 +2,6 @@ package io.github.xpakx.images.like;
 
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.image.ImageRepository;
-import io.github.xpakx.images.image.ImageService;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.like.dto.ImageLikes;
