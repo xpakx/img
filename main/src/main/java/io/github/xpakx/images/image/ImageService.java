@@ -46,7 +46,8 @@ public class ImageService {
         return new ImageData(
                 id,
                 image.getCaption(),
-                image.getCreatedAt()
+                image.getCreatedAt(),
+                image.getUser().getUsername()
         );
     }
 
