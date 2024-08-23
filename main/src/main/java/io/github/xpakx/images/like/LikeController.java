@@ -19,7 +19,7 @@ public class LikeController {
     public ResponseEntity<Object> addLike(
             @Valid @RequestBody LikeRequest likeRequest,
             Principal principal) {
-        service.likeImage(likeRequest.imageId(), principal.getName());
+        service.likeImage(principal.getName(), likeRequest.imageId());
         return ResponseEntity.ok().build();
     }
 
@@ -27,7 +27,7 @@ public class LikeController {
     public ResponseEntity<Object> unlike(
             @PathVariable String imageId,
             Principal principal) {
-        service.unlikeImage(imageId, principal.getName());
+        service.unlikeImage(principal.getName(), imageId);
         return ResponseEntity.ok().build();
     }
 
