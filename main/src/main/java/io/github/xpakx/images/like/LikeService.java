@@ -17,16 +17,19 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-    private final ImageService imageService;
     private final Sqids sqids;
 
     public void likeImage(String username, String imageSqId) {
         Long imageId = transformToId(imageSqId);
-        var image = imageService.getBySqId(imageSqId);
+        var imageAuthor = imageRepository
+                .findById(imageId)
+                .map((img) -> img.getUser().getUsername())
+                .orElseThrow();
+
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
-        if (image.author().equals(username)) {
+        if (imageAuthor.equals(username)) {
             throw new RuntimeException("Cannot like own images.");
         }
 
