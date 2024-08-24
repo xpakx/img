@@ -12,7 +12,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
-    public void followUser(String userUsername, String requesterUsername) {
+    public void followUser(String requesterUsername, String userUsername) {
         if (userUsername.equals(requesterUsername)) {
             throw new RuntimeException("Cannot follow yourself.");
         }
@@ -33,5 +33,17 @@ public class FollowService {
         follow.setFollower(userRepository.getReferenceById(requesterId));
 
         followRepository.save(follow);
+    }
+
+    public void unfollowUser(String requesterUsername, String userUsername) {
+        var requesterId = userRepository.findByUsername(requesterUsername)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+        var userId = userRepository.findByUsername(userUsername)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+        Follow follow = followRepository.findByUserIdAndFollowerId(userId, requesterId)
+                .orElseThrow(() -> new RuntimeException("Follow not found."));
+        followRepository.delete(follow);
     }
 }
