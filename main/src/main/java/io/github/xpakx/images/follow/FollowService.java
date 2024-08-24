@@ -16,13 +16,8 @@ public class FollowService {
         if (userUsername.equals(requesterUsername)) {
             throw new RuntimeException("Cannot follow yourself.");
         }
-        var requesterId = userRepository.findByUsername(requesterUsername)
-                .map(User::getId)
-                .orElseThrow(UserNotFoundException::new);
-        var userId = userRepository.findByUsername(userUsername)
-                .map(User::getId)
-                .orElseThrow(UserNotFoundException::new);
-
+        var requesterId = getUserId(requesterUsername);
+        var userId = getUserId(userUsername);
 
         if (followRepository.existsByUserIdAndFollowerId(userId, requesterId)) {
             throw new RuntimeException("Already followed.");
@@ -36,14 +31,16 @@ public class FollowService {
     }
 
     public void unfollowUser(String requesterUsername, String userUsername) {
-        var requesterId = userRepository.findByUsername(requesterUsername)
-                .map(User::getId)
-                .orElseThrow(UserNotFoundException::new);
-        var userId = userRepository.findByUsername(userUsername)
-                .map(User::getId)
-                .orElseThrow(UserNotFoundException::new);
+        var requesterId = getUserId(requesterUsername);
+        var userId = getUserId(userUsername);
         Follow follow = followRepository.findByUserIdAndFollowerId(userId, requesterId)
                 .orElseThrow(() -> new RuntimeException("Follow not found."));
         followRepository.delete(follow);
+    }
+
+    private Long getUserId(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
     }
 }
