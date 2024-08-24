@@ -9,6 +9,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -61,29 +62,30 @@ public class FollowService {
     }
 
     private void updateFollowCountCache(Long userId, int delta) {
-        var cache = cacheManager.getCache("followCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(userId, Long.class);
-            cache.put(
-                    userId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> followRepository.countByUserId(userId)
-                    ) + delta
-            );
-        }
+        updateCache(
+                "followCountCache",
+                userId,
+                () -> followRepository.countByUserId(userId),
+                delta
+        );
     }
 
     private void updateFollowingCountCache(Long userId, int delta) {
-        var cache = cacheManager.getCache("followingCountCache");
+        updateCache(
+                "followingCountCache",
+                userId,
+                () -> followRepository.countByFollowerId(userId),
+                delta
+        );
+    }
+
+    private void updateCache(String cacheName, Long key, Supplier<Long> supplier, int delta) {
+        var cache = cacheManager.getCache(cacheName);
         if (cache != null) {
-            Long currentLikeCount = cache.get(userId, Long.class);
+            Long currentCount = cache.get(key, Long.class);
             cache.put(
-                    userId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> followRepository.countByFollowerId(userId)
-                    ) + delta
+                    key,
+                    Objects.requireNonNullElseGet(currentCount, supplier) + delta
             );
         }
     }
