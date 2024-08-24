@@ -2,6 +2,7 @@ package io.github.xpakx.images.follow;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.follow.dto.UserFollows;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,12 @@ public class FollowService {
         return userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
+    }
+
+    public UserFollows getFollowCount(String username) {
+        var userId = getUserId(username);
+        var followers = followRepository.countByUserId(userId);
+        var following = followRepository.countByFollowerId(userId);
+        return new UserFollows(followers, following);
     }
 }

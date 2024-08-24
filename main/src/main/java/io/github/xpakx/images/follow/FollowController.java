@@ -1,6 +1,8 @@
 package io.github.xpakx.images.follow;
 
 import io.github.xpakx.images.follow.dto.FollowRequest;
+import io.github.xpakx.images.follow.dto.UserFollows;
+import io.github.xpakx.images.like.dto.ImageLikes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +29,10 @@ public class FollowController {
             Principal principal) {
         service.unfollowUser(principal.getName(), username);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/user/{username}/follows")
+    public UserFollows getFollowCount(@PathVariable String username) {
+        return service.getFollowCount(username);
     }
 }
