@@ -3,6 +3,9 @@ package io.github.xpakx.images.follow;
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.follow.dto.UserFollows;
+import io.github.xpakx.images.follow.error.AlreadyFollowedException;
+import io.github.xpakx.images.follow.error.FollowNotFoundException;
+import io.github.xpakx.images.follow.error.SelfFollowException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
@@ -20,13 +23,13 @@ public class FollowService {
 
     public void followUser(String requesterUsername, String userUsername) {
         if (userUsername.equals(requesterUsername)) {
-            throw new RuntimeException("Cannot follow yourself.");
+            throw new SelfFollowException("Cannot follow yourself.");
         }
         var requesterId = getUserId(requesterUsername);
         var userId = getUserId(userUsername);
 
         if (followRepository.existsByUserIdAndFollowerId(userId, requesterId)) {
-            throw new RuntimeException("Already followed.");
+            throw new AlreadyFollowedException("Already followed.");
         }
 
         Follow follow = new Follow();
@@ -42,7 +45,7 @@ public class FollowService {
         var requesterId = getUserId(requesterUsername);
         var userId = getUserId(userUsername);
         Follow follow = followRepository.findByUserIdAndFollowerId(userId, requesterId)
-                .orElseThrow(() -> new RuntimeException("Follow not found."));
+                .orElseThrow(() -> new FollowNotFoundException("Follow not found."));
         followRepository.delete(follow);
         updateFollowCountCache(userId, -1);
         updateFollowingCountCache(requesterId, -1);
