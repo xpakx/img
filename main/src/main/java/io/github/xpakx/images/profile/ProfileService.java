@@ -10,6 +10,8 @@ import io.github.xpakx.images.profile.dto.ProfileDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
@@ -18,7 +20,7 @@ public class ProfileService {
     private final FollowRepository followRepository;
     private final ImageRepository imageRepository;
 
-    public ProfileDetails getUserProfile(String username) {
+    public ProfileDetails getUserProfile(String username, String currentUser) {
         var user = profileRepository.findByUserUsername(username)
                 .map(this::toProfileData)
                 .orElseGet(() -> getDefaultProfile(username));
@@ -27,13 +29,26 @@ public class ProfileService {
         long following = followRepository.countByFollowerId(user.id());
         long posts = imageRepository.countByUserId(user.id());
 
+        boolean followed = checkFollow(currentUser, user.id());
+
         return new ProfileDetails(
                 user.username(),
                 user.description(),
                 posts,
                 followers,
-                following
+                following,
+                followed
         );
+    }
+
+    private boolean checkFollow(String currentUser, Long id) {
+        if (currentUser == null) {
+            return false;
+        }
+        var userId = userRepository.findByUsername(currentUser)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+        return followRepository.existsByUserIdAndFollowerId(id, userId);
     }
 
     private ProfileData getDefaultProfile(String username) {

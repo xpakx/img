@@ -5,6 +5,7 @@ public record ProfileDetails(
         String description,
         Long posts,
         Long followers,
-        Long following
+        Long following,
+        boolean followed
 ) {
 }
