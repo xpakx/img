@@ -7,6 +7,7 @@ import { ProfileService } from 'src/app/profile/profile.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from '../dto/page';
 import { Image } from '../dto/image';
+import { FollowService } from 'src/app/follow/follow.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,8 +19,9 @@ export class ProfileComponent implements OnInit {
   idForImageModal?: String = undefined;
   user?: User;
   images: Image[] = [];
+  following: boolean = false;
 
-  constructor(private location: Location, private route: ActivatedRoute, private profileService: ProfileService) { }
+  constructor(private location: Location, private route: ActivatedRoute, private profileService: ProfileService, private followService: FollowService) { }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -70,4 +72,16 @@ export class ProfileComponent implements OnInit {
       this.closeImage();
     }
   }
+
+
+  follow(): void {
+    if(!this.username) {
+      return;
+    }
+    this.followService.follow(this.username).subscribe({
+      next: (_response: any) => this.following = true,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
 }

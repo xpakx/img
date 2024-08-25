@@ -7,7 +7,9 @@
         <div class="profile-header">
             <h1>{{username}}</h1>
             <button>Edit Profile</button>
-            <button>Follow</button>
+            <button [class.following]="following" (click) = "follow()">
+              {{ following ? "Unfollow" : "Follow"}}
+            </button>
             <button>Message</button>
         </div>
         <div class="profile-stats">
