@@ -8,7 +8,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from '../dto/page';
 import { Image } from '../dto/image';
 import { FollowService } from 'src/app/follow/follow.service';
-import { FollowData } from 'src/app/follow/dto/follow-data';
 
 @Component({
   selector: 'app-profile',
@@ -20,7 +19,6 @@ export class ProfileComponent implements OnInit {
   idForImageModal?: String = undefined;
   user?: User;
   images: Image[] = [];
-  following: boolean = false;
 
   constructor(private location: Location, private route: ActivatedRoute, private profileService: ProfileService, private followService: FollowService) { }
 
@@ -74,29 +72,22 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-
-
   followClick(): void {
-    if(this.following) this.unfollow();
-    else this.follow();
+    if (!this.user) return;
+    if(this.user.followed) this.unfollow(this.user);
+    else this.follow(this.user);
   }
 
-  follow(): void {
-    if(!this.username) {
-      return;
-    }
-    this.followService.follow({username: this.username}).subscribe({
-      next: (_response: any) => this.following = true,
+  follow(user: User): void {
+    this.followService.follow({username: user.username}).subscribe({
+      next: (_response: any) => user.followed = true,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
 
-  unfollow(): void {
-    if(!this.username) {
-      return;
-    }
-    this.followService.unfollow(this.username).subscribe({
-      next: (_response: any) => this.following = false,
+  unfollow(user: User): void {
+    this.followService.unfollow(user.username).subscribe({
+      next: (_response: any) => user.followed = false,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
