@@ -6,6 +6,7 @@ public record ProfileDetails(
         Long posts,
         Long followers,
         Long following,
-        boolean followed
+        boolean followed,
+        boolean owner
 ) {
 }

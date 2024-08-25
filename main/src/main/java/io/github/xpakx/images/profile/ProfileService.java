@@ -37,7 +37,8 @@ public class ProfileService {
                 posts,
                 followers,
                 following,
-                followed
+                followed,
+                user.username().equals(currentUser)
         );
     }
 
