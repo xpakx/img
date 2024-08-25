@@ -5,4 +5,5 @@ export interface User {
     posts: number,
     followers: number,
     following: number,
+    followed: boolean,
 }
