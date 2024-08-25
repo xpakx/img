@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
+import { LikeData } from 'src/app/like/dto/like-data';
 import { LikeService } from 'src/app/like/like.service';
 import { environment } from 'src/environments/environment';
 
@@ -18,7 +19,7 @@ export class ImageComponent implements OnInit {
 
   ngOnInit(): void {
     this.likeService.getLikes(this.id).subscribe({
-      next: (response: {likes: number}) => this.likes = response.likes,
+      next: (response: LikeData) => this.likes = response.likes,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
@@ -29,7 +30,7 @@ export class ImageComponent implements OnInit {
   }
 
   like(): void {
-    this.likeService.like(this.id).subscribe({
+    this.likeService.like({imageId: this.id}).subscribe({
       next: (_response: any) => this.liked = true,
       error: (err: HttpErrorResponse) => console.log(err),
     });

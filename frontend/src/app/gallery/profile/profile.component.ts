@@ -8,6 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from '../dto/page';
 import { Image } from '../dto/image';
 import { FollowService } from 'src/app/follow/follow.service';
+import { FollowData } from 'src/app/follow/dto/follow-data';
 
 @Component({
   selector: 'app-profile',
@@ -47,12 +48,12 @@ export class ProfileComponent implements OnInit {
 
   loadFollows(username: String) {
     this.followService.getFollows(username).subscribe({
-      next: (response: {followers: number, following: number}) => this.updateFollows(response),
+      next: (response: FollowData) => this.updateFollows(response),
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
 
-  updateFollows(data: {followers: number, following: number}) {
+  updateFollows(data: FollowData) {
     if(!this.user) return;
     this.user.following = data.following;
     this.user.followers = data.followers;
@@ -100,7 +101,7 @@ export class ProfileComponent implements OnInit {
     if(!this.username) {
       return;
     }
-    this.followService.follow(this.username).subscribe({
+    this.followService.follow({username: this.username}).subscribe({
       next: (_response: any) => this.following = true,
       error: (err: HttpErrorResponse) => console.log(err),
     });
