@@ -74,6 +74,12 @@ export class ProfileComponent implements OnInit {
   }
 
 
+
+  followClick(): void {
+    if(this.following) this.unfollow();
+    else this.follow();
+  }
+
   follow(): void {
     if(!this.username) {
       return;
@@ -84,4 +90,13 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  unfollow(): void {
+    if(!this.username) {
+      return;
+    }
+    this.followService.unfollow(this.username).subscribe({
+      next: (_response: any) => this.following = false,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
 }

@@ -19,4 +19,8 @@ export class FollowService {
   public follow(username: String): Observable<any> {
     return this.http.post<any>(`${this.apiServerUrl}/follows`, {"username": username}, { headers: this.getHeaders() });
   }
+
+  public unfollow(username: String): Observable<any> {
+    return this.http.delete<any>(`${this.apiServerUrl}/follows/users/${username}`, { headers: this.getHeaders() });
+  }
 }
