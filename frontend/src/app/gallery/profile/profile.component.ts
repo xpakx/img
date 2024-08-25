@@ -34,29 +34,13 @@ export class ProfileComponent implements OnInit {
 
   loadProfile(username: String): void {
     this.profileService.getProfile(username).subscribe({
-      next: (response: User) => {
-        this.user = response;
-        this.loadFollows(username);
-      },
+      next: (response: User) => this.user = response,
       error: (err: HttpErrorResponse) => console.log(err),
     });
     this.profileService.getImages(username).subscribe({
       next: (response: Page<Image>) => this.images = response.content,
       error: (err: HttpErrorResponse) => console.log(err),
     });
-  }
-
-  loadFollows(username: String) {
-    this.followService.getFollows(username).subscribe({
-      next: (response: FollowData) => this.updateFollows(response),
-      error: (err: HttpErrorResponse) => console.log(err),
-    });
-  }
-
-  updateFollows(data: FollowData) {
-    if(!this.user) return;
-    this.user.following = data.following;
-    this.user.followers = data.followers;
   }
 
   openImage(id: String) {

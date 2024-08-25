@@ -5,7 +5,7 @@
     @if (user) {
     <div class="profile-info">
         <div class="profile-header">
-            <h1>{{username}}</h1>
+            <h1>{{user.username}}</h1>
             <button>Edit Profile</button>
             <button [class.following]="following" (click) = "followClick()">
               {{ following ? "Unfollow" : "Follow"}}
