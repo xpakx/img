@@ -76,11 +76,21 @@ public class ImageService {
                         .map((image) -> toImageEntity(image, user.getId()))
                         .toList()
         ).stream()
-                .map(this::imageToDto)
+                .map((img) -> imageToDto(img, username))
                 .toList();
 
         updatePostCountCache(user.getId(), result.size());
         return result;
+    }
+
+    private ImageData imageToDto(Image image, String username) {
+        String id = sqids.encode(Collections.singletonList(image.getId()));
+        return new ImageData(
+                id,
+                image.getCaption(),
+                image.getCreatedAt(),
+                username
+        );
     }
 
     private Image toImageEntity(String name, Long userId) {
