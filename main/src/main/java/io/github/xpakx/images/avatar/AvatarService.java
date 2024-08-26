@@ -58,6 +58,9 @@ public class AvatarService {
         Path root = Path.of("uploads/avatars");
         Path path = root.resolve(username);
         try {
+            if(Files.notExists(path)) {
+                path = root.resolve("default.jpg");
+            }
             Resource resource = new UrlResource(path.toUri());
             String typeString = Files.probeContentType(path);
             MediaType type = switch (typeString) {
