@@ -35,7 +35,7 @@ export class UploadComponent implements OnInit {
       return;
     }
 
-    this.upload.sendSound(this.files).subscribe({
+    this.upload.sendImage(this.files).subscribe({
       next: (response: any) => console.log("uploaded", response),
       error: (err: HttpErrorResponse) => console.log(err),
     });

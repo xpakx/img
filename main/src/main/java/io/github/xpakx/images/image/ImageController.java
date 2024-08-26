@@ -2,6 +2,7 @@ package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.image.dto.ImageData;
+import io.github.xpakx.images.image.dto.ImageDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,11 @@ public class ImageController {
     @GetMapping("/image/{id}")
     public ImageData getImageById(@PathVariable String id) {
         return service.getBySqId(id);
+    }
+
+    @GetMapping("/image/{id}/details")
+    public ImageDetails getImageDetailsById(@PathVariable String id, Principal principal) {
+        return service.getImageDetailsBySqId(id, principal.getName());
     }
 
     @GetMapping("/user/{username}/images")

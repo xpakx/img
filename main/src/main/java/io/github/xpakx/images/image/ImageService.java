@@ -1,10 +1,13 @@
 package io.github.xpakx.images.image;
 
+import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
+import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.error.*;
+import io.github.xpakx.images.like.LikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.io.Resource;
@@ -34,6 +37,7 @@ public class ImageService {
     private final UserRepository userRepository;
     private final Sqids sqids;
     private final CacheManager cacheManager;
+    private final LikeRepository likeRepository;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -182,5 +186,33 @@ public class ImageService {
                     ) + delta
             );
         }
+    }
+
+    public ImageDetails getImageDetailsBySqId(String sqId, String username) {
+        Long id = transformToId(sqId);
+        var image = imageRepository
+                .findById(id)
+                .map(this::imageToDto)
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+        long likes = likeRepository.countByImageId(id);
+        return new ImageDetails(
+                image.id(),
+                image.caption(),
+                image.createdAt(),
+                image.author(),
+                likes,
+                checkLike(username, id),
+                image.author().equals(username)
+        );
+    }
+
+    private boolean checkLike(String username, Long imageId) {
+        if (username == null) {
+            return false;
+        }
+        var userId = userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+        return likeRepository.existsByUserIdAndImageId(userId, imageId);
     }
 }
