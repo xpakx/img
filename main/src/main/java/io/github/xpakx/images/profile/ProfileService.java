@@ -38,7 +38,8 @@ public class ProfileService {
                 followers,
                 following,
                 followed,
-                user.username().equals(currentUser)
+                user.username().equals(currentUser),
+                user.avatar()
         );
     }
 
@@ -62,7 +63,8 @@ public class ProfileService {
         return new ProfileData(
                 profile.getUser().getId(),
                 profile.getUser().getUsername(),
-                profile.getDescription()
+                profile.getDescription(),
+                profile.isAvatar()
         );
     }
 
@@ -70,7 +72,8 @@ public class ProfileService {
         return new ProfileData(
                 user.getId(),
                 user.getUsername(),
-                ""
+                "",
+                false
         );
     }
 }

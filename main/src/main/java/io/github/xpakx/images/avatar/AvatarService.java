@@ -57,13 +57,7 @@ public class AvatarService {
         }
         try {
             Resource resource = new UrlResource(path.toUri());
-            String typeString = Files.probeContentType(path);
-            MediaType type = switch (typeString) {
-                case "image/jpeg" -> MediaType.IMAGE_JPEG;
-                case "image/png" -> MediaType.IMAGE_PNG;
-                default -> throw  new CannotLoadFileException("Incorrect filetype");
-            };
-            return new ResourceResult(resource, type);
+            return new ResourceResult(resource, MediaType.IMAGE_JPEG);
         } catch (IOException e) {
             throw new CannotLoadFileException("Cannot load file");
         }
