@@ -58,5 +58,9 @@ export class SettingsComponent {
   }
 
   deleteAvatar() {
+    this.upload.deleteAvatar().subscribe({
+      next: (response: any) => console.log("deleted", response),
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
   }
 }
