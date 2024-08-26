@@ -2,11 +2,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { ImageDetails } from '../gallery/dto/image-details';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UploadService {
+export class ImageService {
   private apiServerUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
@@ -16,12 +17,7 @@ export class UploadService {
     return new HttpHeaders({'Authorization' : `Bearer ${token}`});
   }
 
-  public sendImage(files: FileList): Observable<any> {
-    let formData: FormData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
-    }
-    return this.http.post(`${this.apiServerUrl}/image`, formData, { headers: this.getHeaders() });
+  public getImageDetails(id: String): Observable<ImageDetails> {
+    return this.http.get<ImageDetails>(`${this.apiServerUrl}/image/${id}/details`, { headers: this.getHeaders() });
   }
 }
-
