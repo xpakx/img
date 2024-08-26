@@ -1,6 +1,6 @@
 <div class="profile-section">
     <div class="profile-picture">
-        <img src="https://loremflickr.com/320/240?lock=3333" alt="Profile Picture">
+        <img [src]="apiUrl + '/user/' + username + '/avatar'" alt="Profile Picture">
     </div>
     @if (user) {
     <div class="profile-info">

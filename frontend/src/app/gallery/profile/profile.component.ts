@@ -8,6 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from '../dto/page';
 import { Image } from '../dto/image';
 import { FollowService } from 'src/app/follow/follow.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -15,6 +16,7 @@ import { FollowService } from 'src/app/follow/follow.service';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+  apiUrl: String = environment.apiUrl;
   username?: String;
   idForImageModal?: String = undefined;
   user?: User;

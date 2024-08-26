@@ -6,4 +6,5 @@ export interface User {
     followers: number,
     following: number,
     followed: boolean,
+    avatar: boolean,
 }
