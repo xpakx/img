@@ -1,46 +1,30 @@
 package io.github.xpakx.images.avatar;
 
-import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.common.types.ResourceResult;
-import io.github.xpakx.images.common.types.Result;
-import io.github.xpakx.images.image.Image;
-import io.github.xpakx.images.image.ImageRepository;
-import io.github.xpakx.images.image.dto.ImageData;
-import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.error.*;
-import io.github.xpakx.images.like.LikeRepository;
+import io.github.xpakx.images.profile.Profile;
 import io.github.xpakx.images.profile.ProfileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.sqids.Sqids;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
 
     public void uploadAvatar(MultipartFile file, String username) {
         var user = profileRepository.findByUserUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseGet(() -> createProfile(username));
         // TODO: better file names, saving url in entity
         Path root = Path.of("uploads/avatars");
         try {
@@ -52,15 +36,26 @@ public class AvatarService {
             throw new CouldNotStoreException("Could not store the file");
         }
         user.setAvatar(true);
+        profileRepository.save(user);
+    }
+
+    private Profile createProfile(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+        Profile profile = new Profile();
+        profile.setAvatar(false);
+        profile.setDescription("");
+        profile.setUser(userRepository.getReferenceById(user.getId()));
+        return profile;
     }
 
     public ResourceResult getAvatar(String username) {
         Path root = Path.of("uploads/avatars");
         Path path = root.resolve(username);
+        if(Files.notExists(path)) {
+            path = root.resolve("default.jpg");
+        }
         try {
-            if(Files.notExists(path)) {
-                path = root.resolve("default.jpg");
-            }
             Resource resource = new UrlResource(path.toUri());
             String typeString = Files.probeContentType(path);
             MediaType type = switch (typeString) {
