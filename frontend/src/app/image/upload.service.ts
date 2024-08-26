@@ -23,5 +23,15 @@ export class UploadService {
     }
     return this.http.post(`${this.apiServerUrl}/image`, formData, { headers: this.getHeaders() });
   }
+
+  public sendAvatar(files: FileList): Observable<any> {
+    let formData: FormData = new FormData();
+    formData.append('files', files[0]);
+    return this.http.post(`${this.apiServerUrl}/avatar`, formData, { headers: this.getHeaders() });
+  }
+
+  public deleteAvatar(): Observable<any> {
+    return this.http.delete(`${this.apiServerUrl}/avatar`, { headers: this.getHeaders() });
+  }
 }
 

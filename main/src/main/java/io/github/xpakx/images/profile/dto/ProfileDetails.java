@@ -7,6 +7,7 @@ public record ProfileDetails(
         Long followers,
         Long following,
         boolean followed,
-        boolean owner
+        boolean owner,
+        boolean avatar
 ) {
 }
