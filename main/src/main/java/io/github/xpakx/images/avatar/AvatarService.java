@@ -73,4 +73,21 @@ public class AvatarService {
             throw new CannotLoadFileException("Cannot load file");
         }
     }
+
+    public void deleteAvatar(String username) {
+        var user = profileRepository.findByUserUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        Path root = Path.of("uploads/avatars");
+        Path path = root.resolve(username);
+
+        try {
+            boolean result = Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot delete avatar.");
+        }
+
+        user.setAvatar(false);
+        profileRepository.save(user);
+    }
 }

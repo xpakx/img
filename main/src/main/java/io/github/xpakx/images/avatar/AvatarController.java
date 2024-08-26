@@ -32,4 +32,11 @@ public class AvatarController {
                 .contentType(resource.type())
                 .body(resource.resource());
     }
+
+    @DeleteMapping("/avatar")
+    @ResponseBody
+    public ResponseEntity<?> uploadAvatar(Principal principal) {
+        service.deleteAvatar(principal.getName());
+        return ResponseEntity.ok().build();
+    }
 }
