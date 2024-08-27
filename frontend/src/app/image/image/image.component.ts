@@ -43,4 +43,11 @@ export class ImageComponent implements OnInit {
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
+
+  delete(): void {
+    this.imageService.deleteImage(this.id).subscribe({
+      next: (response: any) => console.log("deleted"),
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
 }

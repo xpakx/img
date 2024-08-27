@@ -20,4 +20,8 @@ export class ImageService {
   public getImageDetails(id: String): Observable<ImageDetails> {
     return this.http.get<ImageDetails>(`${this.apiServerUrl}/image/${id}/details`, { headers: this.getHeaders() });
   }
+
+  public deleteImage(id: String): Observable<any> {
+    return this.http.delete(`${this.apiServerUrl}/image/${id}`, { headers: this.getHeaders() });
+  }
 }
