@@ -45,4 +45,16 @@ public class FeedService {
                 image.getUser().getUsername()
         );
     }
+
+    public Page<ImageData> getFollowFeed(String username, int page) {
+        Long userId = userRepository
+                .findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return imageRepository
+                .getFollowFeed(userId, pageable)
+                .map(this::imageToDto);
+    }
 }

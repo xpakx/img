@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,5 +17,10 @@ public class FeedController {
     @GetMapping("/likes")
     public Page<ImageData> getLiked(@RequestParam int page, Principal principal) {
         return service.getLiked(principal.getName(), page);
+    }
+
+    @GetMapping("/follows")
+    public Page<ImageData> getFollows(@RequestParam int page, Principal principal) {
+        return service.getFollowFeed(principal.getName(), page);
     }
 }
