@@ -21,4 +21,8 @@ export class FeedService {
   public getLikes(page: number = 0): Observable<Page<Image>> {
     return this.http.get<Page<Image>>(`${this.apiServerUrl}/likes?page=${page}`, { headers: this.getHeaders() });
   }
+
+  public getFollowFeed(page: number = 0): Observable<Page<Image>> {
+    return this.http.get<Page<Image>>(`${this.apiServerUrl}/follows?page=${page}`, { headers: this.getHeaders() });
+  }
 }
