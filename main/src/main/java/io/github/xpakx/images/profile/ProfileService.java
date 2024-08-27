@@ -7,6 +7,7 @@ import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.profile.dto.ProfileData;
 import io.github.xpakx.images.profile.dto.ProfileDetails;
+import io.github.xpakx.images.profile.dto.UpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +69,15 @@ public class ProfileService {
         );
     }
 
+    private ProfileData toProfileData(Profile profile, String username, Long userId) {
+        return new ProfileData(
+                userId,
+                username,
+                profile.getDescription(),
+                profile.isAvatar()
+        );
+    }
+
     private ProfileData toProfileData(User user) {
         return new ProfileData(
                 user.getId(),
@@ -75,5 +85,25 @@ public class ProfileService {
                 "",
                 false
         );
+    }
+
+    public ProfileData updateProfile(UpdateProfileRequest request, String username) {
+        var profile = profileRepository.findByUserUsername(username)
+                .orElseGet(() -> createProfile(username));
+        profile.setDescription(request.description());
+        var result = profileRepository.save(profile);
+        return toProfileData(result, username, profile.getUser().getId());
+    }
+
+    private Profile createProfile(String username) {
+        return userRepository.findByUsername(username)
+                .map(this::toProfile)
+                .orElseThrow(UserNotFoundException::new);
+    }
+    private Profile toProfile(User user) {
+        var profile =  new Profile();
+        profile.setUser(userRepository.getReferenceById(user.getId()));
+        profile.setDescription("");
+        return profile;
     }
 }
