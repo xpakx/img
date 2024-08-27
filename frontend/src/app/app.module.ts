@@ -15,6 +15,8 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { ErrorInterceptor } from './error/error.interceptor';
 import { UploadComponent } from './image/upload/upload.component';
+import { LikesComponent } from './feed/likes/likes.component';
+import { FollowedComponent } from './feed/followed/followed.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -26,7 +28,9 @@ import { UploadComponent } from './image/upload/upload.component';
         ProfileComponent,
         LoginComponent,
         RegisterComponent,
-        UploadComponent
+        UploadComponent,
+        LikesComponent,
+        FollowedComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

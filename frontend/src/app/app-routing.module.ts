@@ -6,6 +6,8 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { UploadComponent } from './image/upload/upload.component';
 import { SettingsComponent } from './profile/settings/settings.component';
+import { LikesComponent } from './feed/likes/likes.component';
+import { FollowedComponent } from './feed/followed/followed.component';
 
 const routes: Routes = [
   { path: 'profile/:name', component: ProfileComponent },
@@ -14,6 +16,8 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'upload', component: UploadComponent },
+  { path: 'likes', component: LikesComponent },
+  { path: '', component: FollowedComponent },
 ];
 
 @NgModule({
