@@ -3,10 +3,11 @@ package io.github.xpakx.images.image;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.dto.ImageDetails;
+import io.github.xpakx.images.image.dto.UpdateImageRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,5 +52,14 @@ public class ImageController {
     @DeleteMapping("/image/{id}")
     public void deleteImage(@PathVariable String id, Principal principal) {
         service.deleteImage(id, principal.getName());
+    }
+
+    @PutMapping("/image/{id}/data")
+    public ImageData updateImage(
+            @Valid @RequestBody UpdateImageRequest request,
+            @PathVariable String id,
+            Principal principal
+    ) {
+        return service.updateImage(request, id, principal.getName());
     }
 }

@@ -6,6 +6,7 @@ import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.dto.ImageDetails;
+import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeRepository;
 import lombok.RequiredArgsConstructor;
@@ -214,5 +215,24 @@ public class ImageService {
                 .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
         return likeRepository.existsByUserIdAndImageId(userId, imageId);
+    }
+
+    public ImageData updateImage(UpdateImageRequest request, String sqId, String username) {
+        Long imageId = transformToId(sqId);
+        var image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+
+        if(!image.getUser().getUsername().equals(username)) {
+            throw new NotAnOwnerException("Not an owner");
+        }
+
+        image.setCaption(request.caption());
+        var result = imageRepository.save(image);
+        return new ImageData(
+                sqId,
+                result.getCaption(),
+                result.getCreatedAt(),
+                username
+        );
     }
 }
