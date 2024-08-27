@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FollowedComponent } from './followed.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('FollowedComponent', () => {
   let component: FollowedComponent;
@@ -8,7 +11,9 @@ describe('FollowedComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FollowedComponent]
+      declarations: [FollowedComponent],
+      imports: [RouterTestingModule],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
     })
     .compileComponents();
 

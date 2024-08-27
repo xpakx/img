@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LikesComponent } from './likes.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('LikesComponent', () => {
   let component: LikesComponent;
@@ -8,7 +11,10 @@ describe('LikesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LikesComponent]
+      declarations: [LikesComponent],
+      imports: [RouterTestingModule],
+      providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+
     })
     .compileComponents();
 
