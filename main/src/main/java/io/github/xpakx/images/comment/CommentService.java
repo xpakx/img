@@ -6,11 +6,11 @@ import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
 import io.github.xpakx.images.comment.error.CommentNotFoundException;
 import io.github.xpakx.images.image.ImageRepository;
-import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class CommentService {
     private final Sqids sqids;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
+    private final CacheManager cacheManager;
 
     public CommentData addComment(CommentRequest request, String imageSqId, String username) {
         Long imageId = transformToId(imageSqId);
@@ -39,6 +41,7 @@ public class CommentService {
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
+        updateCommentCountCache(imageId, 1);
         return commentToDto(result, username);
     }
 
@@ -56,16 +59,16 @@ public class CommentService {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
-        String commentAuthor = commentRepository
+        var comment = commentRepository
                 .findById(commentId)
-                .map((img) -> img.getAuthor().getUsername())
                 .orElseThrow(() -> new CommentNotFoundException("No comment with such id"));
 
-        if(!user.getUsername().equals(commentAuthor)) {
+        if(!user.getUsername().equals(comment.getAuthor().getUsername())) {
             throw new NotAnOwnerException("Not an owner");
         }
 
         commentRepository.deleteById(commentId);
+        updateCommentCountCache(comment.getImage().getId(), -1);
     }
 
     private CommentData commentToDto(Comment comment) {
@@ -90,5 +93,19 @@ public class CommentService {
         return commentRepository
                 .findByImageId(imageId, pageable)
                 .map(this::commentToDto);
+    }
+
+    private void updateCommentCountCache(Long imageId, int delta) {
+        var cache = cacheManager.getCache("commentCountCache");
+        if (cache != null) {
+            Long currentLikeCount = cache.get(imageId, Long.class);
+            cache.put(
+                    imageId,
+                    Objects.requireNonNullElseGet(
+                            currentLikeCount,
+                            () -> commentRepository.countByImageId(imageId)
+                    ) + delta
+            );
+        }
     }
 }
