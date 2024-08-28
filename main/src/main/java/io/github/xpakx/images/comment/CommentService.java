@@ -42,7 +42,7 @@ public class CommentService {
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
         updateCommentCountCache(imageId, 1);
-        return commentToDto(result, username);
+        return commentToDto(result, username, username);
     }
 
     private Long transformToId(String imageId) {
@@ -71,28 +71,30 @@ public class CommentService {
         updateCommentCountCache(comment.getImage().getId(), -1);
     }
 
-    private CommentData commentToDto(Comment comment) {
-        return new CommentData(
-                comment.getId(),
-                comment.getContent(),
-                comment.getAuthor().getUsername()
-        );
-    }
-
     private CommentData commentToDto(Comment comment, String username) {
         return new CommentData(
                 comment.getId(),
                 comment.getContent(),
-                username
+                comment.getAuthor().getUsername(),
+                comment.getAuthor().getUsername().equals(username)
         );
     }
 
-    public Page<CommentData> getCommentPage(String imageSqId, int page) {
+    private CommentData commentToDto(Comment comment, String author, String username) {
+        return new CommentData(
+                comment.getId(),
+                comment.getContent(),
+                author,
+                author.equals(username)
+        );
+    }
+
+    public Page<CommentData> getCommentPage(String imageSqId, int page, String username) {
         Long imageId = transformToId(imageSqId);
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         return commentRepository
                 .findByImageId(imageId, pageable)
-                .map(this::commentToDto);
+                .map((c) -> commentToDto(c, username));
     }
 
     private void updateCommentCountCache(Long imageId, int delta) {

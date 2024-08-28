@@ -34,7 +34,7 @@ public class CommentController {
     }
 
     @GetMapping("/image/{id}/comments")
-    public Page<CommentData> getComments(@PathVariable String id, @RequestParam int page) {
-        return service.getCommentPage(id, page);
+    public Page<CommentData> getComments(@PathVariable String id, @RequestParam int page, Principal principal) {
+        return service.getCommentPage(id, page, principal.getName());
     }
 }
