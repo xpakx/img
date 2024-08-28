@@ -22,7 +22,7 @@ export class CommentService {
     return this.http.get<Page<Comment>>(`${this.apiServerUrl}/image/${id}/comments?page=${page}`, { headers: this.getHeaders() });
   }
 
-  public deleteComment(id: String): Observable<any> {
+  public deleteComment(id: number): Observable<any> {
     return this.http.delete(`${this.apiServerUrl}/comment/${id}`, { headers: this.getHeaders() });
   }
 }

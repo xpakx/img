@@ -49,6 +49,7 @@
           <div>
             {{comment.content}}
           </div>
+          @if (comment.owner) {<button (click)="deleteComment(comment.id)">Delete</button>}
         </div>
         } @empty {
         <p>No comments yet</p>
