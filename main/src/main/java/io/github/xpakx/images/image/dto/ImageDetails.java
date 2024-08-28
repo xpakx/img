@@ -8,6 +8,7 @@ public record ImageDetails(
         LocalDateTime createdAt,
         String author,
         Long likes,
+        Long comments,
         boolean liked,
         boolean owner
 ) {
