@@ -11,6 +11,10 @@
           Likes: {{image.likes}}
         </div>
 
+        @if (image.caption) {
+        <div class="caption">{{image.caption}}</div>
+        }
+
         <div class="actions">
             <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" (click)="likeClick()" [class.liked]="image.liked">
                 <title>Like</title>
@@ -20,6 +24,19 @@
                 <title>Comment</title>
                 <path d="M32 2c16.6 0 30 11.6 30 26s-13.4 26-30 26c-4.8 0-9.4-.8-13.6-2.2L2 62l8-14.6C5.4 43.4 2 36.4 2 28 2 13.6 15.4 2 32 2z" />
             </svg>
+
+            @if (image.owner) {
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" (click)="delete()">
+              <title>Delete</title>
+              <path d="M20 10h24v4H20zm-2 4v36c0 2.2 1.8 4 4 4h16c2.2 0 4-1.8 4-4V14h6v-4H12v4h6zM24 20h4v24h-4zm8 0h4v24h-4z" />
+              <path d="M28 2h8v4h-8z" />
+            </svg>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" [routerLink]="'/image/' + image.id + '/edit'">
+                <title>Edit</title>
+                <path d="M41 16l7 7-22 22-9 2 2-9 22-22z" />
+                <path d="M39 18l7 7-3 3-7-7 3-3z" />
+            </svg>
+            }
         </div>
     </div>
 </div>

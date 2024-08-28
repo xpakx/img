@@ -100,6 +100,7 @@ public class ProfileService {
                 .map(this::toProfile)
                 .orElseThrow(UserNotFoundException::new);
     }
+
     private Profile toProfile(User user) {
         var profile =  new Profile();
         profile.setUser(userRepository.getReferenceById(user.getId()));

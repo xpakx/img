@@ -2,13 +2,12 @@ package io.github.xpakx.images.profile;
 
 import io.github.xpakx.images.profile.dto.ProfileData;
 import io.github.xpakx.images.profile.dto.ProfileDetails;
+import io.github.xpakx.images.profile.dto.UpdateProfileRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +24,13 @@ public class ProfileController {
             return null;
         }
         return principal.getName();
+    }
+
+    @PutMapping("/profile")
+    public ProfileData updateImage(
+            @Valid @RequestBody UpdateProfileRequest request,
+            Principal principal
+    ) {
+        return service.updateProfile(request, principal.getName());
     }
 }
