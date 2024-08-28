@@ -6,10 +6,15 @@ import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
 import io.github.xpakx.images.comment.error.CommentNotFoundException;
 import io.github.xpakx.images.image.ImageRepository;
+import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
@@ -34,7 +39,7 @@ public class CommentService {
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
-        return new CommentData(result.getId(), result.getContent(), username);
+        return commentToDto(result, username);
     }
 
     private Long transformToId(String imageId) {
@@ -61,5 +66,29 @@ public class CommentService {
         }
 
         commentRepository.deleteById(commentId);
+    }
+
+    private CommentData commentToDto(Comment comment) {
+        return new CommentData(
+                comment.getId(),
+                comment.getContent(),
+                comment.getAuthor().getUsername()
+        );
+    }
+
+    private CommentData commentToDto(Comment comment, String username) {
+        return new CommentData(
+                comment.getId(),
+                comment.getContent(),
+                username
+        );
+    }
+
+    public Page<CommentData> getCommentPage(String imageSqId, int page) {
+        Long imageId = transformToId(imageSqId);
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return commentRepository
+                .findByImageId(imageId, pageable)
+                .map(this::commentToDto);
     }
 }
