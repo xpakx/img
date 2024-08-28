@@ -26,4 +26,10 @@ public class CommentController {
                 HttpStatus.CREATED
         );
     }
+
+
+    @DeleteMapping("/comment/{id}")
+    public void deleteComment(@PathVariable Long id, Principal principal) {
+        service.deleteComment(id, principal.getName());
+    }
 }

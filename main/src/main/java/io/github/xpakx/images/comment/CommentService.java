@@ -4,8 +4,10 @@ import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
+import io.github.xpakx.images.comment.error.CommentNotFoundException;
 import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.error.IdCorruptedException;
+import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class CommentService {
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
-        return new CommentData(result.getContent(), username);
+        return new CommentData(result.getId(), result.getContent(), username);
     }
 
     private Long transformToId(String imageId) {
@@ -42,5 +44,22 @@ public class CommentService {
             throw new IdCorruptedException("Id corrupted");
         }
         return ids.getFirst();
+    }
+
+
+    public void deleteComment(Long commentId, String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+
+        String commentAuthor = commentRepository
+                .findById(commentId)
+                .map((img) -> img.getAuthor().getUsername())
+                .orElseThrow(() -> new CommentNotFoundException("No comment with such id"));
+
+        if(!user.getUsername().equals(commentAuthor)) {
+            throw new NotAnOwnerException("Not an owner");
+        }
+
+        commentRepository.deleteById(commentId);
     }
 }

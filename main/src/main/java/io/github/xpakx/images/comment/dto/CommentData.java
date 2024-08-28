@@ -1,4 +1,4 @@
 package io.github.xpakx.images.comment.dto;
 
-public record CommentData(String content, String author) {
+public record CommentData(Long id, String content, String author) {
 }
