@@ -9,6 +9,7 @@
         </div>
         <div>
           Likes: {{image.likes}}
+          Comments: {{image.comments}}
         </div>
 
         @if (image.caption) {
@@ -38,5 +39,19 @@
             </svg>
             }
         </div>
+
+        @for (comment of comments; track comment.id) {
+        <div>
+          <div class="profile-link">
+              <img [src]="apiUrl + '/user/' + comment.author + '/avatar'" alt="Profile Picture">
+              <a [routerLink]="'/profile/' + comment.author">{{comment.author}}</a>
+          </div>
+          <div>
+            {{comment.content}}
+          </div>
+        </div>
+        } @empty {
+        <p>No comments yet</p>
+        }
     </div>
 </div>
