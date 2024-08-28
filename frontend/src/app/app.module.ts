@@ -17,6 +17,7 @@ import { ErrorInterceptor } from './error/error.interceptor';
 import { UploadComponent } from './image/upload/upload.component';
 import { LikesComponent } from './feed/likes/likes.component';
 import { FollowedComponent } from './feed/followed/followed.component';
+import { EditComponent } from './image/edit/edit.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -31,6 +32,7 @@ import { FollowedComponent } from './feed/followed/followed.component';
         UploadComponent,
         LikesComponent,
         FollowedComponent,
+        EditComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,

@@ -1,0 +1,7 @@
+<h2>Edit image</h2>
+
+<form [formGroup]="updateForm" (ngSubmit)="send()">
+  <input type = "text" name = "caption" placeholder = "caption" formControlName = "caption">
+
+  <input type = "submit" value = "Send">
+</form>
