@@ -4,6 +4,9 @@ import { LikeService } from 'src/app/like/like.service';
 import { environment } from 'src/environments/environment';
 import { ImageService } from '../image.service';
 import { ImageDetails } from 'src/app/gallery/dto/image-details';
+import { Comment } from '../dto/comment';
+import { CommentService } from 'src/app/comment/comment.service';
+import { Page } from 'src/app/gallery/dto/page';
 
 @Component({
   selector: 'app-image',
@@ -14,12 +17,19 @@ export class ImageComponent implements OnInit {
   @Input() id: String = "";
   apiUrl: String = environment.apiUrl;
   image?: ImageDetails;
+  comments: Comment[] = [];
+  showCommentForm: boolean = false;
 
-  constructor(private imageService: ImageService, private likeService: LikeService) { }
+  constructor(private imageService: ImageService, private likeService: LikeService, private commentService: CommentService) { }
 
   ngOnInit(): void {
     this.imageService.getImageDetails(this.id).subscribe({
       next: (response: ImageDetails) => this.image = response,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+
+    this.commentService.getComments(this.id).subscribe({
+      next: (response: Page<Comment>) => this.comments = response.content,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
@@ -46,8 +56,19 @@ export class ImageComponent implements OnInit {
 
   delete(): void {
     this.imageService.deleteImage(this.id).subscribe({
-      next: (response: any) => console.log("deleted"),
+      next: (_response: any) => console.log("deleted"),
       error: (err: HttpErrorResponse) => console.log(err),
     });
+  }
+
+  deleteComment(id: number): void {
+    this.commentService.deleteComment(id).subscribe({
+      next: (_response: any) => console.log("deleted"),
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  setCommentForm(value: boolean) {
+    this.showCommentForm = value;
   }
 }

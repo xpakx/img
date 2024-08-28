@@ -2,6 +2,7 @@ package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.comment.CommentRepository;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
@@ -39,6 +40,7 @@ public class ImageService {
     private final Sqids sqids;
     private final CacheManager cacheManager;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -196,12 +198,14 @@ public class ImageService {
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
         long likes = likeRepository.countByImageId(id);
+        long comments = commentRepository.countByImageId(id);
         return new ImageDetails(
                 image.id(),
                 image.caption(),
                 image.createdAt(),
                 image.author(),
                 likes,
+                comments,
                 checkLike(username, id),
                 image.author().equals(username)
         );

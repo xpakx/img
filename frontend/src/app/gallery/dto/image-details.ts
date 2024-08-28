@@ -4,6 +4,7 @@ export interface ImageDetails {
   createdAt: Date,
   author: String,
   likes: number,
+  comments: number,
   liked: boolean,
   owner: boolean,
 }

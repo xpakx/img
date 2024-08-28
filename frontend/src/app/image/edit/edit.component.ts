@@ -32,7 +32,7 @@ export class EditComponent {
       return;
     }
     const request: UpdateImageRequest = {
-      caption: this.updateForm.value.caption.value,
+      caption: this.updateForm.value.caption,
     }
 
     this.upload.editImage(this.id, request).subscribe({

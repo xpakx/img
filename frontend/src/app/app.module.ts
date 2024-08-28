@@ -18,6 +18,7 @@ import { UploadComponent } from './image/upload/upload.component';
 import { LikesComponent } from './feed/likes/likes.component';
 import { FollowedComponent } from './feed/followed/followed.component';
 import { EditComponent } from './image/edit/edit.component';
+import { CommentComponent } from './comment/comment/comment.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -33,6 +34,7 @@ import { EditComponent } from './image/edit/edit.component';
         LikesComponent,
         FollowedComponent,
         EditComponent,
+        CommentComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
