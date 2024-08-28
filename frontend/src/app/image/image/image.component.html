@@ -40,6 +40,12 @@
             }
         </div>
 
+        <div class="comment">
+        @if (showCommentForm) {
+        <app-comment [id]="id"></app-comment>
+        } @else {
+        <button (click)="setCommentForm(true)">Create comment</button>
+        }
         @for (comment of comments; track comment.id) {
         <div>
           <div class="profile-link">
@@ -54,5 +60,6 @@
         } @empty {
         <p>No comments yet</p>
         }
+        </div>
     </div>
 </div>

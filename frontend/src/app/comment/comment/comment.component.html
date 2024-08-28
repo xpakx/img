@@ -1,0 +1,5 @@
+<form [formGroup]="commentForm" (ngSubmit)="send()">
+  <input type = "text" name = "content" placeholder = "Enter your comment" formControlName = "content">
+
+  <input type = "submit" value = "Send">
+</form>

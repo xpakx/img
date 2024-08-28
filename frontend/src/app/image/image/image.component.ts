@@ -18,6 +18,7 @@ export class ImageComponent implements OnInit {
   apiUrl: String = environment.apiUrl;
   image?: ImageDetails;
   comments: Comment[] = [];
+  showCommentForm: boolean = false;
 
   constructor(private imageService: ImageService, private likeService: LikeService, private commentService: CommentService) { }
 
@@ -65,5 +66,9 @@ export class ImageComponent implements OnInit {
       next: (_response: any) => console.log("deleted"),
       error: (err: HttpErrorResponse) => console.log(err),
     });
+  }
+
+  setCommentForm(value: boolean) {
+    this.showCommentForm = value;
   }
 }

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Page } from '../gallery/dto/page';
 import { Comment } from '../image/dto/comment';
+import { CommentRequest } from './dto/comment-request';
 
 @Injectable({
   providedIn: 'root'
@@ -24,5 +25,9 @@ export class CommentService {
 
   public deleteComment(id: number): Observable<any> {
     return this.http.delete(`${this.apiServerUrl}/comment/${id}`, { headers: this.getHeaders() });
+  }
+
+  public addComment(id: String, request: CommentRequest): Observable<Comment> {
+    return this.http.post<Comment>(`${this.apiServerUrl}/image/${id}/comment`, request, { headers: this.getHeaders() });
   }
 }
