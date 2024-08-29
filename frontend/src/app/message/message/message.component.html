@@ -1,3 +1,9 @@
 <h1>Private messages</h1>
 
+<p>Current view: {{ type }}</p>
+<div>
+  @if (type != "Sent") {<button (click)="getSent()">Sent</button>}
+  @if (type != "Received") {<button (click)="getReceived()">Received</button>}
+  @if (type != "Unread") {<button (click)="getUnread()">Unread</button>}
+</div>
 <app-message-list [messages]="messages"></app-message-list>

@@ -12,13 +12,31 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class MessageComponent {
   constructor(private privService: PrivateMessageService) { }
   messages: PrivateMessage[] = [];
+  type: "Received" | "Sent" | "Unread" = "Unread";
 
   ngOnInit(): void {
     this.getUnread();
   }
 
   getUnread() {
+    this.type = "Unread";
     this.privService.getUnreadMessages().subscribe({
+      next: (response: Page<PrivateMessage>) => this.messages = response.content,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  getSent() {
+    this.type = "Sent";
+    this.privService.getSentMessages().subscribe({
+      next: (response: Page<PrivateMessage>) => this.messages = response.content,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  getReceived() {
+    this.type = "Received";
+    this.privService.getMessages().subscribe({
       next: (response: Page<PrivateMessage>) => this.messages = response.content,
       error: (err: HttpErrorResponse) => console.log(err),
     });
