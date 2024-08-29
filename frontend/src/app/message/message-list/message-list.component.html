@@ -1,0 +1,16 @@
+
+@for (message of messages; track message.id) {
+<div class="message">
+  <div class="profile-link">
+    <img [src]="apiUrl + '/user/' + message.sender + '/avatar'" alt="Profile Picture">
+    <a [routerLink]="'/profile/' + message.sender">{{message.sender}}</a>
+  </div>
+  <div>
+    {{message.content}}
+  </div>
+  <button (click)="delete(message.id)">Delete</button>
+  <button routerLink="/message" [queryParams]="{to: message.sender}">Reply</button>
+</div>
+} @empty {
+<div>No messages</div>
+}

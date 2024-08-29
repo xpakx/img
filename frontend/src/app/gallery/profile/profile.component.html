@@ -10,7 +10,7 @@
             <button [class.following]="user.followed" (click) = "followClick()">
               {{ user.followed ? "Unfollow" : "Follow"}}
             </button>
-            <button>Message</button>
+            <button routerLink="/message" [queryParams]="{to: username}">Message</button>
         </div>
         <div class="profile-stats">
             <div><strong>{{user.posts}}</strong> posts</div>
