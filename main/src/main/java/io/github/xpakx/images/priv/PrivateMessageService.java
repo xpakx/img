@@ -7,6 +7,10 @@ import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.priv.dto.MessageRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,4 +45,24 @@ public class PrivateMessageService {
         privateMessageRepository.delete(message);
     }
 
+    public Page<PrivateMessage> getMessagePage(int page, String username) {
+        var userId = getUserId(username);
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return privateMessageRepository
+                .findByReceiverId(userId, pageable);
+    }
+
+    public Page<PrivateMessage> getSentMessagePage(int page, String username) {
+        var userId = getUserId(username);
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return privateMessageRepository
+                .findBySenderId(userId, pageable);
+    }
+
+    public Page<PrivateMessage> getUnreadMessagePage(int page, String username) {
+        var userId = getUserId(username);
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return privateMessageRepository
+                .findByReceiverIdAndReadIsFalse(userId, pageable);
+    }
 }
