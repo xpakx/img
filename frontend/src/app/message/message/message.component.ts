@@ -41,4 +41,15 @@ export class MessageComponent {
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }
+
+  delete(id: number) {
+    this.privService.deleteMessage(id).subscribe({
+      next: (_response: any) => this.onDelete(id),
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  onDelete(id: number) {
+    this.messages = this.messages.filter((msg) => msg.id != id);
+  }
 }
