@@ -19,6 +19,8 @@ import { LikesComponent } from './feed/likes/likes.component';
 import { FollowedComponent } from './feed/followed/followed.component';
 import { EditComponent } from './image/edit/edit.component';
 import { CommentComponent } from './comment/comment/comment.component';
+import { MessageListComponent } from './message/message-list/message-list.component';
+import { MessageComponent } from './message/message/message.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -35,6 +37,8 @@ import { CommentComponent } from './comment/comment/comment.component';
         FollowedComponent,
         EditComponent,
         CommentComponent,
+        MessageListComponent,
+        MessageComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
