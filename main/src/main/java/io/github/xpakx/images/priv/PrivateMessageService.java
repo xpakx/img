@@ -13,6 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 @Service
 @RequiredArgsConstructor
 public class PrivateMessageService {
@@ -45,13 +48,6 @@ public class PrivateMessageService {
         privateMessageRepository.delete(message);
     }
 
-    public Page<PrivateMessage> getMessagePage(int page, String username) {
-        var userId = getUserId(username);
-        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return privateMessageRepository
-                .findByReceiverId(userId, pageable);
-    }
-
     public Page<PrivateMessage> getSentMessagePage(int page, String username) {
         var userId = getUserId(username);
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -59,10 +55,32 @@ public class PrivateMessageService {
                 .findBySenderId(userId, pageable);
     }
 
+    public Page<PrivateMessage> getMessagePage(int page, String username) {
+        var userId = getUserId(username);
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        var result = privateMessageRepository
+                .findByReceiverId(userId, pageable);
+        markAsRead(result.getContent());
+        return result;
+    }
+
     public Page<PrivateMessage> getUnreadMessagePage(int page, String username) {
         var userId = getUserId(username);
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return privateMessageRepository
+        var result = privateMessageRepository
                 .findByReceiverIdAndReadIsFalse(userId, pageable);
+        markAsRead(result.getContent());
+        return result;
+    }
+
+    private void markAsRead(List<PrivateMessage> messages) {
+        var toChange = messages.stream()
+                .filter((msg) -> !msg.isRead())
+                .toList();
+        if (toChange.isEmpty()) {
+            return;
+        }
+        toChange.forEach((msg) -> msg.setRead(true));
+        privateMessageRepository.saveAll(toChange);
     }
 }
