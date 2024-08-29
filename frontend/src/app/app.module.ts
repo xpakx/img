@@ -21,6 +21,7 @@ import { EditComponent } from './image/edit/edit.component';
 import { CommentComponent } from './comment/comment/comment.component';
 import { MessageListComponent } from './message/message-list/message-list.component';
 import { MessageComponent } from './message/message/message.component';
+import { MessageFormComponent } from './message/message-form/message-form.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -39,6 +40,7 @@ import { MessageComponent } from './message/message/message.component';
         CommentComponent,
         MessageListComponent,
         MessageComponent,
+        MessageFormComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
