@@ -1,6 +1,7 @@
 package io.github.xpakx.images.priv;
 
 import io.github.xpakx.images.comment.dto.CommentData;
+import io.github.xpakx.images.priv.dto.MessageData;
 import io.github.xpakx.images.priv.dto.MessageRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class PrivateMessageController {
     private final PrivateMessageService service;
 
     @PostMapping("/messages")
-    public ResponseEntity<PrivateMessage> sendMessage(
+    public ResponseEntity<MessageData> sendMessage(
             @Valid @RequestBody MessageRequest request,
             Principal principal) {
         return new ResponseEntity<>(
@@ -32,17 +33,17 @@ public class PrivateMessageController {
     }
 
     @GetMapping("/messages")
-    public Page<PrivateMessage> getMessages(@RequestParam int page, Principal principal) {
+    public Page<MessageData> getMessages(@RequestParam int page, Principal principal) {
         return service.getMessagePage(page, principal.getName());
     }
 
     @GetMapping("/messages/sent")
-    public Page<PrivateMessage> getSentMessages(@RequestParam int page, Principal principal) {
+    public Page<MessageData> getSentMessages(@RequestParam int page, Principal principal) {
         return service.getSentMessagePage(page, principal.getName());
     }
 
     @GetMapping("/messages/unread")
-    public Page<PrivateMessage> getUnreadMessages(@RequestParam int page, Principal principal) {
+    public Page<MessageData> getUnreadMessages(@RequestParam int page, Principal principal) {
         return service.getUnreadMessagePage(page, principal.getName());
     }
 }
