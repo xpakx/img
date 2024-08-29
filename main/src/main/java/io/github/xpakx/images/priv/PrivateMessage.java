@@ -43,4 +43,16 @@ public class PrivateMessage {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+
+
+    public boolean inConversation(String username) {
+        if (sender.getUsername().equals(username)) {
+            return true;
+        }
+        if (receiver.getUsername().equals(username)) {
+            return true;
+        }
+        return false;
+    }
 }

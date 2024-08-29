@@ -5,9 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -24,5 +22,10 @@ public class PrivateMessageController {
                 service.sendMessage(request, principal.getName()),
                 HttpStatus.CREATED
         );
+    }
+
+    @DeleteMapping("/messages/{id}")
+    public void deleteMessage(@PathVariable Long id, Principal principal) {
+        service.deleteMessage(id, principal.getName());
     }
 }

@@ -2,6 +2,8 @@ package io.github.xpakx.images.priv;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.comment.error.CommentNotFoundException;
+import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.priv.dto.MessageRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +30,15 @@ public class PrivateMessageService {
                 .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
     }
+
+    public void deleteMessage(Long id, String username) {
+        var message = privateMessageRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("No message with such id"));
+        if(!message.inConversation(username)) {
+            throw new NotAnOwnerException("Not in conversation");
+        }
+        privateMessageRepository.delete(message);
+    }
+
 }
