@@ -7,6 +7,7 @@ import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.priv.dto.MessageData;
 import io.github.xpakx.images.priv.dto.MessageRequest;
+import io.github.xpakx.images.priv.error.MessageNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +43,7 @@ public class PrivateMessageService {
     public void deleteMessage(Long id, String username) {
         var message = privateMessageRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("No message with such id"));
+                .orElseThrow(() -> new MessageNotFoundException("No message with such id"));
         if(!message.inConversation(username)) {
             throw new NotAnOwnerException("Not in conversation");
         }
