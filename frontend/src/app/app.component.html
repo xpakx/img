@@ -1,7 +1,10 @@
 <header>
     <div class="header-container">
         <div class="logo">Images</div>
-        <input type="text" placeholder="Search">
+        <div class="search-container">
+          <input class="search" type="text" placeholder="Search" (keydown.enter)="search()" #searchInput>
+          <button class="search-button" (click)="search()">🔍</button>
+        </div>
         <div class="header-icons" *ngIf="logged">
             <a routerLink="/" class="icon">🏠</a>
             <a routerLink="/priv" class="icon">✉️</a>

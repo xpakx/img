@@ -21,7 +21,6 @@ header {
 }
 
 header input[type="text"] {
-    margin: 0 20px;
     padding: 5px;
     border: 1px solid #dbdbdb;
     border-radius: 3px;
@@ -38,4 +37,25 @@ header input[type="text"] {
 .main {
     padding: 20px;
     width: 100vw;
+}
+
+.search-container {
+    margin: 0 20px;
+    position: relative;
+    display: inline-block;
+}
+
+.search-container .search-button {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.search-container:focus-within .search-button {
+  display: block;
 }
