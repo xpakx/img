@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { User } from '../gallery/dto/user';
 import { Image } from '../gallery/dto/image';
 import { Page } from '../gallery/dto/page';
+import { UpdateProfileRequest } from './dto/update-profile-request';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +26,9 @@ export class ProfileService {
 
   public getImages(username: String, page: number = 0): Observable<Page<Image>> {
     return this.http.get<Page<Image>>(`${this.apiServerUrl}/user/${username}/images?page=${page}`, { headers: this.getHeaders() });
+  }
+
+  public updateProfile(request: UpdateProfileRequest): Observable<User> {
+    return this.http.put<User>(`${this.apiServerUrl}/profile`, request, { headers: this.getHeaders() });
   }
 }
