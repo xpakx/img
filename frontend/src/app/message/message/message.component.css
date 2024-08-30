@@ -1,0 +1,22 @@
+:host {
+    padding: 20px;
+}
+
+h1, h2 {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.option-button {
+    padding: 8px 16px;
+    margin: 10px 5px;
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+
+.option-button:hover {
+    background-color: #e0e0e0;
+}
