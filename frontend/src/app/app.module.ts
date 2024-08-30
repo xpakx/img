@@ -22,6 +22,7 @@ import { CommentComponent } from './comment/comment/comment.component';
 import { MessageListComponent } from './message/message-list/message-list.component';
 import { MessageComponent } from './message/message/message.component';
 import { MessageFormComponent } from './message/message-form/message-form.component';
+import { SearchComponent } from './search/search/search.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -41,6 +42,7 @@ import { MessageFormComponent } from './message/message-form/message-form.compon
         MessageListComponent,
         MessageComponent,
         MessageFormComponent,
+        SearchComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
