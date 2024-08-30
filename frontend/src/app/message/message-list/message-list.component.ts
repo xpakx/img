@@ -10,6 +10,7 @@ import { environment } from 'src/environments/environment';
 export class MessageListComponent {
   apiUrl: String = environment.apiUrl;
   @Input() messages: PrivateMessage[] = [];
+  @Input() reply: boolean = false;
   @Output("delete") deleteEvent = new EventEmitter<number>();
 
   constructor() { }

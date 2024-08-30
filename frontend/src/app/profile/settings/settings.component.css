@@ -1,0 +1,80 @@
+:host {
+    padding: 20px;
+}
+
+h1, h2 {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.profile-picture {
+    margin: 20px 0;
+    display: flex;
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+}
+
+.hidden {
+    display: none;
+}
+
+.option-button, form input[type="submit"] {
+    padding: 8px 16px;
+    margin: 10px 5px;
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.option-button:hover, input[type="submit"]:hover  {
+    background-color: #e0e0e0;
+}
+
+.option-button-blue {
+    background-color: #66f;
+    color: #fff;
+    border: none;
+}
+
+.option-button-blue:disabled {
+    background-color: #a0a0f0;
+    cursor: not-allowed;
+}
+
+.option-button-red {
+    background-color: #f66;
+    color: #fff;
+    border: none;
+}
+
+.option-button-red:disabled {
+    background-color: #f99;
+    cursor: not-allowed;
+}
+
+.desc, .empty-desc {
+    font-size: 16px;
+    margin: 15px 0;
+    color: #555;
+    max-width: 500px;
+}
+
+.empty-desc {
+    font-style: italic;
+    color: #999;
+}
+
+form input[type="text"] {
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

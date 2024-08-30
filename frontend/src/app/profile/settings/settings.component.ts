@@ -4,21 +4,28 @@ import { User } from 'src/app/gallery/dto/user';
 import { UploadService } from 'src/app/image/upload.service';
 import { ProfileService } from '../profile.service';
 import { environment } from 'src/environments/environment';
+import { UpdateProfileRequest } from '../dto/update-profile-request';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
 })
 export class SettingsComponent {
   files?: FileList;
-  @ViewChild('fileselection', {static: true}) fileselectionButton?: ElementRef;
+  @ViewChild('fileselection', {static: false}) fileselectionButton?: ElementRef;
   profile?: User;
   apiUrl: String = environment.apiUrl;
+  profileForm: FormGroup;
 
-  constructor(private upload: UploadService, private profileService: ProfileService) { }
+  constructor(private upload: UploadService, private profileService: ProfileService, private formBuilder: FormBuilder) {
+    this.profileForm = this.formBuilder.group({
+      description: [''],
+    });
+  }
 
   ngOnInit(): void {
     let username = localStorage.getItem("username");
@@ -60,6 +67,16 @@ export class SettingsComponent {
   deleteAvatar() {
     this.upload.deleteAvatar().subscribe({
       next: (response: any) => console.log("deleted", response),
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  updateDescription() {
+    const request: UpdateProfileRequest = {
+      description: this.profileForm.value.description,
+    };
+    this.profileService.updateProfile(request).subscribe({
+      next: (response: User) => console.log("updated", response),
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }

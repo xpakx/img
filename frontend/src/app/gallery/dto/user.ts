@@ -7,4 +7,5 @@ export interface User {
     following: number,
     followed: boolean,
     avatar: boolean,
+    owner: boolean,
 }

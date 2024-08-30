@@ -31,6 +31,7 @@ public class AvatarService {
             if (!Files.exists(root)) {
                 Files.createDirectories(root);
             }
+            Files.deleteIfExists(root.resolve(username));
             Files.copy(file.getInputStream(), root.resolve(username));
         } catch (Exception e) {
             throw new CouldNotStoreException("Could not store the file");
