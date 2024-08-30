@@ -6,4 +6,4 @@
   @if (type != "Received") {<button class="option-button" (click)="getReceived()">Received</button>}
   @if (type != "Unread") {<button class="option-button" (click)="getUnread()">Unread</button>}
 </div>
-<app-message-list [messages]="messages" (delete)="delete($event)"></app-message-list>
+<app-message-list [messages]="messages" [reply]="received" (delete)="delete($event)"></app-message-list>

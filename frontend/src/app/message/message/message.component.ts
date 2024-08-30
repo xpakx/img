@@ -13,6 +13,7 @@ export class MessageComponent {
   constructor(private privService: PrivateMessageService) { }
   messages: PrivateMessage[] = [];
   type: "Received" | "Sent" | "Unread" = "Unread";
+  received: boolean = false;
 
   ngOnInit(): void {
     this.getUnread();
@@ -20,6 +21,7 @@ export class MessageComponent {
 
   getUnread() {
     this.type = "Unread";
+    this.received = true;
     this.privService.getUnreadMessages().subscribe({
       next: (response: Page<PrivateMessage>) => this.messages = response.content,
       error: (err: HttpErrorResponse) => console.log(err),
@@ -28,6 +30,7 @@ export class MessageComponent {
 
   getSent() {
     this.type = "Sent";
+    this.received = false;
     this.privService.getSentMessages().subscribe({
       next: (response: Page<PrivateMessage>) => this.messages = response.content,
       error: (err: HttpErrorResponse) => console.log(err),
@@ -36,6 +39,7 @@ export class MessageComponent {
 
   getReceived() {
     this.type = "Received";
+    this.received = true;
     this.privService.getMessages().subscribe({
       next: (response: Page<PrivateMessage>) => this.messages = response.content,
       error: (err: HttpErrorResponse) => console.log(err),

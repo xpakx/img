@@ -2,14 +2,24 @@
 @for (message of messages; track message.id) {
 <div class="message">
   <div class="profile-link">
+
+  @if (reply) {
     <img class="profile-picture" [src]="apiUrl + '/user/' + message.sender + '/avatar'" alt="Profile Picture">
     <a [routerLink]="'/profile/' + message.sender">{{message.sender}}</a>
+    } @else {
+    <img class="profile-picture" [src]="apiUrl + '/user/' + message.receiver + '/avatar'" alt="Profile Picture">
+    <span>
+    to <a [routerLink]="'/profile/' + message.receiver">{{message.receiver}}</a>
+    </span>
+    }
   </div>
   <div class="content">
     {{message.content}}
   </div>
   <button class="option-button option-button-red" (click)="delete(message.id)">Delete</button>
+  @if (reply) {
   <button class="option-button" routerLink="/message" [queryParams]="{to: message.sender}">Reply</button>
+  }
 </div>
 } @empty {
 <div class="empty">No messages</div>
