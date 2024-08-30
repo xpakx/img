@@ -16,7 +16,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 })
 export class SettingsComponent {
   files?: FileList;
-  @ViewChild('fileselection', {static: true}) fileselectionButton?: ElementRef;
+  @ViewChild('fileselection', {static: false}) fileselectionButton?: ElementRef;
   profile?: User;
   apiUrl: String = environment.apiUrl;
   profileForm: FormGroup;
