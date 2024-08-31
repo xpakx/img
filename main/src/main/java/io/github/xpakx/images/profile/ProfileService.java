@@ -3,7 +3,9 @@ package io.github.xpakx.images.profile;
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.follow.FollowRepository;
+import io.github.xpakx.images.follow.FollowService;
 import io.github.xpakx.images.image.ImageRepository;
+import io.github.xpakx.images.image.ImageService;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.profile.dto.ProfileData;
 import io.github.xpakx.images.profile.dto.ProfileDetails;
@@ -19,16 +21,17 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
-    private final ImageRepository imageRepository;
+    private final FollowService followService;
+    private final ImageService imageService;
 
     public ProfileDetails getUserProfile(String username, String currentUser) {
         var user = profileRepository.findByUserUsername(username)
                 .map(this::toProfileData)
                 .orElseGet(() -> getDefaultProfile(username));
 
-        long followers = followRepository.countByUserId(user.id());
-        long following = followRepository.countByFollowerId(user.id());
-        long posts = imageRepository.countByUserId(user.id());
+        long followers = followService.getFollowersCount(user.id(), username);
+        long following = followService.getFollowingCount(user.id(), username);
+        long posts = imageService.getPostCount(user.id(), username);
 
         boolean followed = checkFollow(currentUser, user.id());
 

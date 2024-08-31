@@ -1,7 +1,9 @@
 package io.github.xpakx.images.cache;
 
 import io.github.xpakx.images.cache.annotation.CacheDecrement;
+import io.github.xpakx.images.cache.annotation.CacheDecrements;
 import io.github.xpakx.images.cache.annotation.CacheIncrement;
+import io.github.xpakx.images.cache.annotation.CacheIncrements;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -71,6 +73,31 @@ public class CacheAspect {
                 return; // TODO ?
             }
             cache.put( key, currentLikeCount + delta );
+        }
+    }
+
+
+    @Pointcut("@annotation(cacheIncrements)")
+    public void cacheIncrementsContainerPointcut(CacheIncrements cacheIncrements) {
+    }
+
+    @AfterReturning(value = "cacheIncrementsContainerPointcut(cacheIncrements)", argNames = "joinPoint,cacheIncrements")
+    public void incrementAfterReturning(JoinPoint joinPoint, CacheIncrements cacheIncrements) {
+        CacheIncrement[] increments = cacheIncrements.value();
+        for (var increment : increments) {
+            incrementAfterReturning(joinPoint, increment);
+        }
+    }
+
+    @Pointcut("@annotation(cacheDecrements)")
+    public void cacheDecrementsContainerPointcut(CacheDecrements cacheDecrements) {
+    }
+
+    @AfterReturning(value = "cacheDecrementsContainerPointcut(cacheDecrements)", argNames = "joinPoint,cacheDecrements")
+    public void decrementAfterReturning(JoinPoint joinPoint, CacheDecrements cacheDecrements) {
+        CacheDecrement[] decrements = cacheDecrements.value();
+        for (var decrement : decrements) {
+            decrementAfterReturning(joinPoint, decrement);
         }
     }
 }

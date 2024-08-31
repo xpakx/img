@@ -11,7 +11,6 @@ import java.util.List;
 public interface ImageRepository extends JpaRepository<Image, Long> {
     Page<Image> findByUserUsername(String username, Pageable pageable);
 
-    @Cacheable(value = "postCountCache", key = "#userId")
     long countByUserId(Long userId);
 
     @Query("""

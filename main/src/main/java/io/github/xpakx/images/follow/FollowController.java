@@ -33,6 +33,9 @@ public class FollowController {
 
     @GetMapping("/user/{username}/follows")
     public UserFollows getFollowCount(@PathVariable String username) {
-        return service.getFollowCount(username);
+        return new UserFollows(
+                service.getFollowersCount(username),
+                service.getFollowingCount(username)
+        );
     }
 }

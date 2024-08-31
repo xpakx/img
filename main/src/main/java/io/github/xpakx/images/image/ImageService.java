@@ -2,7 +2,7 @@ package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
-import io.github.xpakx.images.comment.CommentRepository;
+import io.github.xpakx.images.cache.annotation.CacheDecrement;
 import io.github.xpakx.images.comment.CommentService;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
@@ -13,6 +13,7 @@ import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -68,6 +69,7 @@ public class ImageService {
                 .map(this::imageToDto);
     }
 
+    // TODO: update cache by result size
     public List<ImageData> uploadImages(MultipartFile[] files, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -151,6 +153,7 @@ public class ImageService {
         }
     }
 
+    @CacheDecrement(value = "postCountCache", key = "#username")
     public void deleteImage(String imageId, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -166,7 +169,6 @@ public class ImageService {
         }
 
         imageRepository.deleteById(id);
-        updatePostCountCache(user.getId(), -1);
     }
 
     private Long transformToId(String imageId) {
@@ -239,5 +241,10 @@ public class ImageService {
                 result.getCreatedAt(),
                 username
         );
+    }
+
+    @Cacheable(value = "postCountCache", key = "#username")
+    public long getPostCount(Long userId, String username) {
+        return imageRepository.countByUserId(userId);
     }
 }
