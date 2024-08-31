@@ -2,6 +2,8 @@ package io.github.xpakx.images.comment;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.cache.annotation.CacheDecrement;
+import io.github.xpakx.images.cache.annotation.CacheIncrement;
 import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
 import io.github.xpakx.images.comment.error.CommentNotFoundException;
@@ -10,7 +12,7 @@ import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +29,8 @@ public class CommentService {
     private final Sqids sqids;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-    private final CacheManager cacheManager;
 
+    @CacheIncrement(value = "commentCountCache", key = "#imageSqId")
     public CommentData addComment(CommentRequest request, String imageSqId, String username) {
         Long imageId = transformToId(imageSqId);
         Long userId = userRepository
@@ -41,7 +42,6 @@ public class CommentService {
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
-        updateCommentCountCache(imageId, 1);
         return commentToDto(result, username, username);
     }
 
@@ -54,8 +54,8 @@ public class CommentService {
         return ids.getFirst();
     }
 
-
-    public void deleteComment(Long commentId, String username) {
+    @CacheDecrement(value = "commentCountCache", key = "#return")
+    public String deleteComment(Long commentId, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -68,7 +68,7 @@ public class CommentService {
         }
 
         commentRepository.deleteById(commentId);
-        updateCommentCountCache(comment.getImage().getId(), -1);
+        return sqids.encode(List.of(comment.getImage().getId()));
     }
 
     private CommentData commentToDto(Comment comment, String username) {
@@ -89,25 +89,17 @@ public class CommentService {
         );
     }
 
+    @Cacheable(value = "commentCountCache", key = "#imageSqId")
+    public long getCommentCount(String imageSqId) {
+        Long imageId = transformToId(imageSqId);
+        return commentRepository.countByImageId(imageId);
+    }
+
     public Page<CommentData> getCommentPage(String imageSqId, int page, String username) {
         Long imageId = transformToId(imageSqId);
         Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
         return commentRepository
                 .findByImageId(imageId, pageable)
                 .map((c) -> commentToDto(c, username));
-    }
-
-    private void updateCommentCountCache(Long imageId, int delta) {
-        var cache = cacheManager.getCache("commentCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(imageId, Long.class);
-            cache.put(
-                    imageId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> commentRepository.countByImageId(imageId)
-                    ) + delta
-            );
-        }
     }
 }

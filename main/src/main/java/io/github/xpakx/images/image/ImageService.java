@@ -2,16 +2,18 @@ package io.github.xpakx.images.image;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
-import io.github.xpakx.images.comment.CommentRepository;
+import io.github.xpakx.images.cache.annotation.CacheDecrement;
+import io.github.xpakx.images.cache.annotation.CacheDelta;
+import io.github.xpakx.images.comment.CommentService;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
-import io.github.xpakx.images.like.LikeRepository;
+import io.github.xpakx.images.like.LikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -38,9 +40,8 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final Sqids sqids;
-    private final CacheManager cacheManager;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
+    private final LikeService likeService;
+    private final CommentService commentService;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -67,6 +68,7 @@ public class ImageService {
                 .map(this::imageToDto);
     }
 
+    @CacheDelta(value = "postCountCache", key = "#username", delta = "#return.size()")
     public List<ImageData> uploadImages(MultipartFile[] files, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -75,7 +77,7 @@ public class ImageService {
                 .map(this::trySave)
                 .toList();
         System.out.println(results);
-        var result =  imageRepository.saveAll(
+        return imageRepository.saveAll(
                 results
                         .stream()
                         .filter(Result::isOk)
@@ -85,9 +87,6 @@ public class ImageService {
         ).stream()
                 .map((img) -> imageToDto(img, username))
                 .toList();
-
-        updatePostCountCache(user.getId(), result.size());
-        return result;
     }
 
     private ImageData imageToDto(Image image, String username) {
@@ -150,6 +149,7 @@ public class ImageService {
         }
     }
 
+    @CacheDecrement(value = "postCountCache", key = "#username")
     public void deleteImage(String imageId, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -165,7 +165,6 @@ public class ImageService {
         }
 
         imageRepository.deleteById(id);
-        updatePostCountCache(user.getId(), -1);
     }
 
     private Long transformToId(String imageId) {
@@ -177,28 +176,14 @@ public class ImageService {
         return ids.getFirst();
     }
 
-    private void updatePostCountCache(Long userId, int delta) {
-        var cache = cacheManager.getCache("postCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(userId, Long.class);
-            cache.put(
-                    userId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> imageRepository.countByUserId(userId)
-                    ) + delta
-            );
-        }
-    }
-
     public ImageDetails getImageDetailsBySqId(String sqId, String username) {
         Long id = transformToId(sqId);
         var image = imageRepository
                 .findById(id)
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
-        long likes = likeRepository.countByImageId(id);
-        long comments = commentRepository.countByImageId(id);
+        long likes = likeService.getLikeCount(sqId);
+        long comments = commentService.getCommentCount(sqId);
         return new ImageDetails(
                 image.id(),
                 image.caption(),
@@ -218,7 +203,7 @@ public class ImageService {
         var userId = userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
-        return likeRepository.existsByUserIdAndImageId(userId, imageId);
+        return likeService.likeExists(userId, imageId);
     }
 
     public ImageData updateImage(UpdateImageRequest request, String sqId, String username) {
@@ -238,5 +223,10 @@ public class ImageService {
                 result.getCreatedAt(),
                 username
         );
+    }
+
+    @Cacheable(value = "postCountCache", key = "#username")
+    public long getPostCount(Long userId, String username) {
+        return imageRepository.countByUserId(userId);
     }
 }

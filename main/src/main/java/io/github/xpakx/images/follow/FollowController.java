@@ -30,9 +30,4 @@ public class FollowController {
         service.unfollowUser(principal.getName(), username);
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/user/{username}/follows")
-    public UserFollows getFollowCount(@PathVariable String username) {
-        return service.getFollowCount(username);
-    }
 }
