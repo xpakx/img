@@ -9,6 +9,7 @@ import io.github.xpakx.images.follow.error.FollowNotFoundException;
 import io.github.xpakx.images.follow.error.SelfFollowException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
-    private final FollowCountService followCountService;
 
     @CacheIncrement(value = "followCountCache", key = "#userUsername")
     @CacheIncrement(value = "followingCountCache", key = "#requesterUsername")
@@ -54,21 +54,13 @@ public class FollowService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public long getFollowersCount(String username) {
-        var userId = getUserId(username);
-        return followCountService.getFollowersCount(userId, username);
-    }
-
+    @Cacheable(value = "followCountCache", key = "#username")
     public long getFollowersCount(Long userId, String username) {
-        return followCountService.getFollowersCount(userId, username);
+        return followRepository.countByUserId(userId);
     }
 
-    public long getFollowingCount(String username) {
-        var userId = getUserId(username);
-        return followCountService.getFollowingCount(userId, username);
-    }
-
+    @Cacheable(value = "followingCountCache", key = "#username")
     public long getFollowingCount(Long userId, String username) {
-        return followCountService.getFollowingCount(userId, username);
+        return followRepository.countByFollowerId(userId);
     }
 }
