@@ -36,23 +36,23 @@ public class CacheAspect {
     public void cacheDecrementPointcut(CacheDecrement cacheDecrement) {
     }
 
-    @AfterReturning(value = "cacheIncrementPointcut(cacheIncrement)", argNames = "joinPoint,cacheIncrement")
-    public void incrementAfterReturning(JoinPoint joinPoint, CacheIncrement cacheIncrement) {
+    @AfterReturning(value = "cacheIncrementPointcut(cacheIncrement)", argNames = "joinPoint,cacheIncrement,returnValue", returning = "returnValue")
+    public void incrementAfterReturning(JoinPoint joinPoint, CacheIncrement cacheIncrement, Object returnValue) {
         String cacheName = cacheIncrement.value();
-        String key = parseKey(joinPoint, cacheIncrement.key());
+        String key = parseKey(joinPoint, cacheIncrement.key(), returnValue);
         logger.debug("Increment {} in cache {}", key, cacheName);
         updateCache(cacheName, key, 1);
     }
 
-    @AfterReturning(value = "cacheDecrementPointcut(cacheDecrement)", argNames = "joinPoint,cacheDecrement")
-    public void decrementAfterReturning(JoinPoint joinPoint, CacheDecrement cacheDecrement) {
+    @AfterReturning(value = "cacheDecrementPointcut(cacheDecrement)", argNames = "joinPoint,cacheDecrement,returnValue", returning = "returnValue")
+    public void decrementAfterReturning(JoinPoint joinPoint, CacheDecrement cacheDecrement, Object returnValue) {
         String cacheName = cacheDecrement.value();
-        String key = parseKey(joinPoint, cacheDecrement.key());
+        String key = parseKey(joinPoint, cacheDecrement.key(), returnValue);
         logger.debug("Decrement {} in cache {}", key, cacheName);
         updateCache(cacheName, key, -1);
     }
 
-    private String parseKey(JoinPoint joinPoint, String keyExpression) {
+    private String parseKey(JoinPoint joinPoint, String keyExpression, Object returnValue) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         ExpressionParser parser = new SpelExpressionParser();
         StandardEvaluationContext context = new StandardEvaluationContext();
@@ -62,6 +62,7 @@ public class CacheAspect {
         for (int i = 0; i < parameterNames.length; i++) {
             context.setVariable(parameterNames[i], args[i]);
         }
+        context.setVariable("return", returnValue);
         return parser.parseExpression(keyExpression) .getValue(context, String.class);
     }
 
@@ -81,11 +82,11 @@ public class CacheAspect {
     public void cacheIncrementsContainerPointcut(CacheIncrements cacheIncrements) {
     }
 
-    @AfterReturning(value = "cacheIncrementsContainerPointcut(cacheIncrements)", argNames = "joinPoint,cacheIncrements")
-    public void incrementAfterReturning(JoinPoint joinPoint, CacheIncrements cacheIncrements) {
+    @AfterReturning(value = "cacheIncrementsContainerPointcut(cacheIncrements)", argNames = "joinPoint,cacheIncrements,returnValue", returning = "returnValue")
+    public void incrementAfterReturning(JoinPoint joinPoint, CacheIncrements cacheIncrements, Object returnValue) {
         CacheIncrement[] increments = cacheIncrements.value();
         for (var increment : increments) {
-            incrementAfterReturning(joinPoint, increment);
+            incrementAfterReturning(joinPoint, increment, returnValue);
         }
     }
 
@@ -93,11 +94,11 @@ public class CacheAspect {
     public void cacheDecrementsContainerPointcut(CacheDecrements cacheDecrements) {
     }
 
-    @AfterReturning(value = "cacheDecrementsContainerPointcut(cacheDecrements)", argNames = "joinPoint,cacheDecrements")
-    public void decrementAfterReturning(JoinPoint joinPoint, CacheDecrements cacheDecrements) {
+    @AfterReturning(value = "cacheDecrementsContainerPointcut(cacheDecrements)", argNames = "joinPoint,cacheDecrements,returnValue", returning = "returnValue")
+    public void decrementAfterReturning(JoinPoint joinPoint, CacheDecrements cacheDecrements, Object returnValue) {
         CacheDecrement[] decrements = cacheDecrements.value();
         for (var decrement : decrements) {
-            decrementAfterReturning(joinPoint, decrement);
+            decrementAfterReturning(joinPoint, decrement, returnValue);
         }
     }
 }
