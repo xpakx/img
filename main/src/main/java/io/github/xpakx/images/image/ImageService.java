@@ -3,6 +3,7 @@ package io.github.xpakx.images.image;
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.cache.annotation.CacheDecrement;
+import io.github.xpakx.images.cache.annotation.CacheDelta;
 import io.github.xpakx.images.comment.CommentService;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
@@ -69,7 +70,7 @@ public class ImageService {
                 .map(this::imageToDto);
     }
 
-    // TODO: update cache by result size
+    @CacheDelta(value = "postCountCache", key = "#username", delta = "#return.size()")
     public List<ImageData> uploadImages(MultipartFile[] files, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -78,7 +79,7 @@ public class ImageService {
                 .map(this::trySave)
                 .toList();
         System.out.println(results);
-        var result =  imageRepository.saveAll(
+        return imageRepository.saveAll(
                 results
                         .stream()
                         .filter(Result::isOk)
@@ -88,9 +89,6 @@ public class ImageService {
         ).stream()
                 .map((img) -> imageToDto(img, username))
                 .toList();
-
-        updatePostCountCache(user.getId(), result.size());
-        return result;
     }
 
     private ImageData imageToDto(Image image, String username) {
@@ -178,20 +176,6 @@ public class ImageService {
             throw new IdCorruptedException("Id corrupted");
         }
         return ids.getFirst();
-    }
-
-    private void updatePostCountCache(Long userId, int delta) {
-        var cache = cacheManager.getCache("postCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(userId, Long.class);
-            cache.put(
-                    userId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> imageRepository.countByUserId(userId)
-                    ) + delta
-            );
-        }
     }
 
     public ImageDetails getImageDetailsBySqId(String sqId, String username) {
