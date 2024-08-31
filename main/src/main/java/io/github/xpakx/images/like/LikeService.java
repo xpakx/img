@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -77,5 +76,9 @@ public class LikeService {
     public long getLikeCount(String imageSqId) {
         Long imageId = transformToId(imageSqId);
         return likeRepository.countByImageId(imageId);
+    }
+
+    public boolean likeExists(Long userId, Long imageId) {
+        return likeRepository.existsByUserIdAndImageId(userId, imageId);
     }
 }

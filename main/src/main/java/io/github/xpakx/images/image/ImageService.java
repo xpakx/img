@@ -3,13 +3,13 @@ package io.github.xpakx.images.image;
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.comment.CommentRepository;
+import io.github.xpakx.images.comment.CommentService;
 import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
 import io.github.xpakx.images.image.dto.ImageData;
 import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
-import io.github.xpakx.images.like.LikeRepository;
 import io.github.xpakx.images.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
@@ -40,9 +40,8 @@ public class ImageService {
     private final UserRepository userRepository;
     private final Sqids sqids;
     private final CacheManager cacheManager;
-    private final LikeRepository likeRepository;
     private final LikeService likeService;
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -200,7 +199,7 @@ public class ImageService {
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
         long likes = likeService.getLikeCount(sqId);
-        long comments = commentRepository.countByImageId(id);
+        long comments = commentService.getCommentCount(sqId);
         return new ImageDetails(
                 image.id(),
                 image.caption(),
@@ -220,7 +219,7 @@ public class ImageService {
         var userId = userRepository.findByUsername(username)
                 .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
-        return likeRepository.existsByUserIdAndImageId(userId, imageId);
+        return likeService.likeExists(userId, imageId);
     }
 
     public ImageData updateImage(UpdateImageRequest request, String sqId, String username) {

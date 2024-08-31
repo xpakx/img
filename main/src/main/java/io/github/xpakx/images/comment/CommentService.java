@@ -2,6 +2,8 @@ package io.github.xpakx.images.comment;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.cache.CacheAspect;
+import io.github.xpakx.images.cache.annotation.CacheIncrement;
 import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
 import io.github.xpakx.images.comment.error.CommentNotFoundException;
@@ -11,6 +13,7 @@ import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,7 @@ public class CommentService {
     private final ImageRepository imageRepository;
     private final CacheManager cacheManager;
 
+    @CacheIncrement(value = "commentCountCache", key = "#imageSqId")
     public CommentData addComment(CommentRequest request, String imageSqId, String username) {
         Long imageId = transformToId(imageSqId);
         Long userId = userRepository
@@ -41,7 +45,6 @@ public class CommentService {
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
-        updateCommentCountCache(imageId, 1);
         return commentToDto(result, username, username);
     }
 
@@ -54,7 +57,7 @@ public class CommentService {
         return ids.getFirst();
     }
 
-
+    // TODO: increment cache with annotation
     public void deleteComment(Long commentId, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -87,6 +90,12 @@ public class CommentService {
                 author,
                 author.equals(username)
         );
+    }
+
+    @Cacheable(value = "commentCountCache", key = "#imageSqId")
+    public long getCommentCount(String imageSqId) {
+        Long imageId = transformToId(imageSqId);
+        return commentRepository.countByImageId(imageId);
     }
 
     public Page<CommentData> getCommentPage(String imageSqId, int page, String username) {
