@@ -1,9 +1,6 @@
 package io.github.xpakx.images.cache;
 
-import io.github.xpakx.images.cache.annotation.CacheDecrement;
-import io.github.xpakx.images.cache.annotation.CacheDecrements;
-import io.github.xpakx.images.cache.annotation.CacheIncrement;
-import io.github.xpakx.images.cache.annotation.CacheIncrements;
+import io.github.xpakx.images.cache.annotation.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Pointcut;
-
-import java.util.Objects;
 
 @Aspect
 @Service
@@ -100,5 +95,32 @@ public class CacheAspect {
         for (var decrement : decrements) {
             decrementAfterReturning(joinPoint, decrement, returnValue);
         }
+    }
+
+    @Pointcut("@annotation(cacheDelta)")
+    public void cacheDeltaPointcut(CacheDelta cacheDelta) {
+    }
+
+    @AfterReturning(value = "cacheDeltaPointcut(cacheDelta)", argNames = "joinPoint,cacheDelta,returnValue", returning = "returnValue")
+    public void changeAfterReturning(JoinPoint joinPoint, CacheDelta cacheDelta, Object returnValue) {
+        String cacheName = cacheDelta.value();
+        String key = parseKey(joinPoint, cacheDelta.key(), returnValue);
+        int delta = parseDelta(joinPoint, cacheDelta.delta(), returnValue);
+        logger.debug("Change {} in cache {} by {}", key, cacheName, delta);
+        updateCache(cacheName, key, delta);
+    }
+
+    private Integer parseDelta(JoinPoint joinPoint, String keyExpression, Object returnValue) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        ExpressionParser parser = new SpelExpressionParser();
+        StandardEvaluationContext context = new StandardEvaluationContext();
+
+        var parameterNames = signature.getParameterNames();
+        var args = joinPoint.getArgs();
+        for (int i = 0; i < parameterNames.length; i++) {
+            context.setVariable(parameterNames[i], args[i]);
+        }
+        context.setVariable("return", returnValue);
+        return parser.parseExpression(keyExpression) .getValue(context, Integer.class);
     }
 }
