@@ -1,6 +1,8 @@
 package io.github.xpakx.images.like;
 
 import io.github.xpakx.images.account.UserRepository;
+import io.github.xpakx.images.cache.annotation.CacheDecrement;
+import io.github.xpakx.images.cache.annotation.CacheIncrement;
 import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.ImageNotFoundException;
@@ -26,6 +28,7 @@ public class LikeService {
     private final Sqids sqids;
     private final CacheManager cacheManager;
 
+    @CacheIncrement(value = "likeCountCache", key = "#imageSqId")
     public void likeImage(String username, String imageSqId) {
         Long imageId = transformToId(imageSqId);
         var imageAuthor = imageRepository
@@ -61,6 +64,7 @@ public class LikeService {
         return ids.getFirst();
     }
 
+    @CacheDecrement(value = "likeCountCache", key = "#imageSqId")
     public void unlikeImage(String username, String imageSqId) {
         Long imageId = transformToId(imageSqId);
         var user = userRepository.findByUsername(username)
