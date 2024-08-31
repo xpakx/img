@@ -17,6 +17,8 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Pointcut;
 
+import java.util.Objects;
+
 @Aspect
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class CacheAspect {
         String cacheName = cacheIncrement.value();
         String key = parseKey(joinPoint, cacheIncrement.key());
         logger.debug("Increment {} in cache {}", key, cacheName);
+        updateCache(cacheName, key, 1);
     }
 
     @AfterReturning(value = "cacheDecrementPointcut(cacheDecrement)", argNames = "joinPoint,cacheDecrement")
@@ -44,6 +47,7 @@ public class CacheAspect {
         String cacheName = cacheDecrement.value();
         String key = parseKey(joinPoint, cacheDecrement.key());
         logger.debug("Decrement {} in cache {}", key, cacheName);
+        updateCache(cacheName, key, -1);
     }
 
     private String parseKey(JoinPoint joinPoint, String keyExpression) {
@@ -57,5 +61,16 @@ public class CacheAspect {
             context.setVariable(parameterNames[i], args[i]);
         }
         return parser.parseExpression(keyExpression) .getValue(context, String.class);
+    }
+
+    private void updateCache(String cacheName, String key, int delta) {
+        var cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            Long currentLikeCount = cache.get(key, Long.class);
+            if (currentLikeCount == null) {
+                return; // TODO ?
+            }
+            cache.put( key, currentLikeCount + delta );
+        }
     }
 }

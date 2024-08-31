@@ -7,12 +7,12 @@ import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.ImageNotFoundException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
-import io.github.xpakx.images.like.dto.ImageLikes;
 import io.github.xpakx.images.like.error.ImageOwnerException;
 import io.github.xpakx.images.like.error.LikeExistsException;
 import io.github.xpakx.images.like.error.LikeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
@@ -52,7 +52,6 @@ public class LikeService {
         like.setImage(imageRepository.getReferenceById(imageId));
 
         likeRepository.save(like);
-        updateLikeCountCache(imageId, 1);
     }
 
     private Long transformToId(String imageId) {
@@ -72,26 +71,11 @@ public class LikeService {
         Like like = likeRepository.findByUserIdAndImageId(user.getId(), imageId)
                 .orElseThrow(() -> new LikeNotFoundException("Like not found."));
         likeRepository.delete(like);
-        updateLikeCountCache(imageId, -1);
     }
 
-    public ImageLikes getLikeCount(String imageSqId) {
+    @Cacheable(value = "likeCountCache", key = "#imageSqId")
+    public long getLikeCount(String imageSqId) {
         Long imageId = transformToId(imageSqId);
-        var likes = likeRepository.countByImageId(imageId);
-        return new ImageLikes(likes);
-    }
-
-    private void updateLikeCountCache(Long imageId, int delta) {
-        var cache = cacheManager.getCache("likeCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(imageId, Long.class);
-            cache.put(
-                    imageId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> likeRepository.countByImageId(imageId)
-                    ) + delta
-            );
-        }
+        return likeRepository.countByImageId(imageId);
     }
 }

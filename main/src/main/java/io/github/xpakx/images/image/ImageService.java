@@ -10,6 +10,7 @@ import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeRepository;
+import io.github.xpakx.images.like.LikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.io.Resource;
@@ -40,6 +41,7 @@ public class ImageService {
     private final Sqids sqids;
     private final CacheManager cacheManager;
     private final LikeRepository likeRepository;
+    private final LikeService likeService;
     private final CommentRepository commentRepository;
 
     public ImageData getBySqId(String sqId) {
@@ -197,7 +199,7 @@ public class ImageService {
                 .findById(id)
                 .map(this::imageToDto)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
-        long likes = likeRepository.countByImageId(id);
+        long likes = likeService.getLikeCount(sqId);
         long comments = commentRepository.countByImageId(id);
         return new ImageDetails(
                 image.id(),

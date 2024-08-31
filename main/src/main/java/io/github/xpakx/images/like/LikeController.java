@@ -33,6 +33,6 @@ public class LikeController {
 
     @GetMapping("/image/{id}/likes")
     public ImageLikes getImageById(@PathVariable String id) {
-        return service.getLikeCount(id);
+        return new ImageLikes(service.getLikeCount(id));
     }
 }
