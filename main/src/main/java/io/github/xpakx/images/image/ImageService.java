@@ -13,7 +13,6 @@ import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -41,7 +40,6 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
     private final Sqids sqids;
-    private final CacheManager cacheManager;
     private final LikeService likeService;
     private final CommentService commentService;
 

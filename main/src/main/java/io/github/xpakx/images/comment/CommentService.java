@@ -2,7 +2,6 @@ package io.github.xpakx.images.comment;
 
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
-import io.github.xpakx.images.cache.CacheAspect;
 import io.github.xpakx.images.cache.annotation.CacheDecrement;
 import io.github.xpakx.images.cache.annotation.CacheIncrement;
 import io.github.xpakx.images.comment.dto.CommentData;
@@ -13,7 +12,6 @@ import io.github.xpakx.images.image.error.IdCorruptedException;
 import io.github.xpakx.images.image.error.NotAnOwnerException;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,6 @@ public class CommentService {
     private final Sqids sqids;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-    private final CacheManager cacheManager;
 
     @CacheIncrement(value = "commentCountCache", key = "#imageSqId")
     public CommentData addComment(CommentRequest request, String imageSqId, String username) {

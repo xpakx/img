@@ -65,13 +65,10 @@ public class CacheAspect {
         var cache = cacheManager.getCache(cacheName);
         if (cache != null) {
             Long currentLikeCount = cache.get(key, Long.class);
-            if (currentLikeCount == null) {
-                return; // TODO ?
-            }
-            cache.put( key, currentLikeCount + delta );
+            if (currentLikeCount == null) { return; }
+            cache.put(key, currentLikeCount + delta);
         }
     }
-
 
     @Pointcut("@annotation(cacheIncrements)")
     public void cacheIncrementsContainerPointcut(CacheIncrements cacheIncrements) {

@@ -11,7 +11,6 @@ import io.github.xpakx.images.like.error.ImageOwnerException;
 import io.github.xpakx.images.like.error.LikeExistsException;
 import io.github.xpakx.images.like.error.LikeNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.sqids.Sqids;
@@ -25,7 +24,6 @@ public class LikeService {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final Sqids sqids;
-    private final CacheManager cacheManager;
 
     @CacheIncrement(value = "likeCountCache", key = "#imageSqId")
     public void likeImage(String username, String imageSqId) {
