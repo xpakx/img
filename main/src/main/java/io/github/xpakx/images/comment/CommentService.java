@@ -3,6 +3,7 @@ package io.github.xpakx.images.comment;
 import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.cache.CacheAspect;
+import io.github.xpakx.images.cache.annotation.CacheDecrement;
 import io.github.xpakx.images.cache.annotation.CacheIncrement;
 import io.github.xpakx.images.comment.dto.CommentData;
 import io.github.xpakx.images.comment.dto.CommentRequest;
@@ -57,8 +58,8 @@ public class CommentService {
         return ids.getFirst();
     }
 
-    // TODO: increment cache with annotation
-    public void deleteComment(Long commentId, String username) {
+    @CacheDecrement(value = "commentCountCache", key = "#return")
+    public String deleteComment(Long commentId, String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -71,7 +72,7 @@ public class CommentService {
         }
 
         commentRepository.deleteById(commentId);
-        updateCommentCountCache(comment.getImage().getId(), -1);
+        return sqids.encode(List.of(comment.getImage().getId()));
     }
 
     private CommentData commentToDto(Comment comment, String username) {
@@ -104,19 +105,5 @@ public class CommentService {
         return commentRepository
                 .findByImageId(imageId, pageable)
                 .map((c) -> commentToDto(c, username));
-    }
-
-    private void updateCommentCountCache(Long imageId, int delta) {
-        var cache = cacheManager.getCache("commentCountCache");
-        if (cache != null) {
-            Long currentLikeCount = cache.get(imageId, Long.class);
-            cache.put(
-                    imageId,
-                    Objects.requireNonNullElseGet(
-                            currentLikeCount,
-                            () -> commentRepository.countByImageId(imageId)
-                    ) + delta
-            );
-        }
     }
 }
