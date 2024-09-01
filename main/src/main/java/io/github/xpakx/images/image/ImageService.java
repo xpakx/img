@@ -12,6 +12,7 @@ import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeService;
+import io.github.xpakx.images.upload.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
@@ -42,6 +43,7 @@ public class ImageService {
     private final Sqids sqids;
     private final LikeService likeService;
     private final CommentService commentService;
+    private final UploadService uploadService;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -74,7 +76,7 @@ public class ImageService {
                 .orElseThrow(UserNotFoundException::new);
         List<Result<String>> results = Arrays
                 .stream(files)
-                .map(this::trySave)
+                .map(uploadService::trySave)
                 .toList();
         System.out.println(results);
         return imageRepository.saveAll(
@@ -102,28 +104,9 @@ public class ImageService {
     private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
         //TODO: make image private before editing caption etc.?
-        image.setImageUrl("uploads/" + name);
+        image.setImageUrl(name);
         image.setUser(userRepository.getReferenceById(userId));
         return image;
-    }
-
-    private Result<String> trySave(MultipartFile file) {
-        if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
-            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
-        }
-        // TODO: better file structure and check mimetype
-
-        Path root = Path.of("uploads");
-        String name = file.getOriginalFilename();
-        try {
-            if (!Files.exists(root)) {
-                Files.createDirectories(root);
-            }
-            Files.copy(file.getInputStream(), root.resolve(name));
-        } catch (Exception e) {
-            return new Result.Err<>(new CouldNotStoreException("Could not store the file"));
-        }
-        return new Result.Ok<>(name);
     }
 
     public ResourceResult getImage(String sqId) {
@@ -134,7 +117,7 @@ public class ImageService {
                 .map(Image::getImageUrl)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
-        Path path = Paths.get(url);
+        Path path = Paths.get("uploads/" + url);
         try {
             Resource resource = new UrlResource(path.toUri());
             String typeString = Files.probeContentType(path);

@@ -5,6 +5,7 @@ import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.profile.Profile;
 import io.github.xpakx.images.profile.ProfileRepository;
+import io.github.xpakx.images.upload.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -21,22 +22,13 @@ import java.nio.file.Path;
 public class AvatarService {
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
+    private final UploadService uploadService;
 
     public void uploadAvatar(MultipartFile file, String username) {
         var user = profileRepository.findByUserUsername(username)
                 .orElseGet(() -> createProfile(username));
-        // TODO: better file names, saving url in entity
-        Path root = Path.of("uploads/avatars");
-        try {
-            if (!Files.exists(root)) {
-                Files.createDirectories(root);
-            }
-            Files.deleteIfExists(root.resolve(username));
-            Files.copy(file.getInputStream(), root.resolve(username));
-        } catch (Exception e) {
-            throw new CouldNotStoreException("Could not store the file");
-        }
-        user.setAvatarUrl("avatars/" + username);
+        var name = uploadService.trySaveAvatar(file);
+        user.setAvatarUrl("avatars/" + name);
         profileRepository.save(user);
     }
 
