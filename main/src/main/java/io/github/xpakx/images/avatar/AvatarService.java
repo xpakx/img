@@ -59,16 +59,7 @@ public class AvatarService {
     public void deleteAvatar(String username) {
         var user = profileRepository.findByUserUsername(username)
                 .orElseThrow(UserNotFoundException::new);
-
-        Path root = Path.of("uploads/avatars");
-        Path path = root.resolve(username);
-
-        try {
-            boolean result = Files.deleteIfExists(path);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot delete avatar.");
-        }
-
+        uploadService.delete(user.getAvatarUrl());
         user.setAvatarUrl("avatars/default.jpg");
         profileRepository.save(user);
     }

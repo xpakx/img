@@ -138,16 +138,16 @@ public class ImageService {
                 .orElseThrow(UserNotFoundException::new);
 
         Long id = transformToId(imageId);
-        String imageOwner = imageRepository
+        var image = imageRepository
                 .findById(id)
-                .map((img) -> img.getUser().getUsername())
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
-        if(!user.getUsername().equals(imageOwner)) {
+        if(!user.getUsername().equals(image.getUser().getUsername())) {
             throw new NotAnOwnerException("Not an owner");
         }
 
         imageRepository.deleteById(id);
+        uploadService.delete(image.getImageUrl());
     }
 
     private Long transformToId(String imageId) {

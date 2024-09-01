@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -45,5 +46,16 @@ public class UploadService {
             return new Result.Err<>(new CouldNotStoreException("Could not store the file"));
         }
         return new Result.Ok<>(name);
+    }
+
+    public void delete(String url) {
+        if ("avatars/default.jpg".equals(url)) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(root.resolve(url));
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot delete.");
+        }
     }
 }
