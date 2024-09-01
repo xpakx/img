@@ -4,7 +4,7 @@
     </div>
     <div class="details" *ngIf="image">
         <div class="profile-link">
-            <img [src]="apiUrl + '/user/' + image.author + '/avatar'" alt="Profile Picture">
+            <img [src]="apiUrl + '/' + image.avatarUrl" alt="Profile Picture">
             <a [routerLink]="'/profile/' + image.author">{{image.author}}</a>
         </div>
         <div>
@@ -49,7 +49,7 @@
         @for (comment of comments; track comment.id) {
         <div>
           <div class="profile-link">
-              <img [src]="apiUrl + '/user/' + comment.author + '/avatar'" alt="Profile Picture">
+              <img [src]="apiUrl + '/' + comment.avatarUrl" alt="Profile Picture">
               <a [routerLink]="'/profile/' + comment.author">{{comment.author}}</a>
           </div>
           <div>

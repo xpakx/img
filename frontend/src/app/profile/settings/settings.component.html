@@ -3,7 +3,7 @@
 <h1>Hello, {{profile.username}}!</h1>
 <h2>Avatar</h2>
 <div class="profile-picture">
-    <img [src]="apiUrl + '/user/' + profile.username + '/avatar'" alt="Profile Picture">
+    <img [src]="apiUrl + '/' + profile.avatarUrl" alt="Profile Picture">
 </div>
 <input class="hidden" type="file" (change)="selectFile($event)" #fileselection>
 <button class="option-button" (click)="openFileSelection()">

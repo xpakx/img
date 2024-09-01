@@ -1,6 +1,7 @@
 export interface User {
     username: String,
     description: String,
+    avatarUrl: String,
 
     posts: number,
     followers: number,
