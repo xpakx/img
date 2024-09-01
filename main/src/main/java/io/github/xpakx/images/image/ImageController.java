@@ -41,9 +41,9 @@ public class ImageController {
         return service.uploadImages(files, principal.getName());
     }
 
-    @GetMapping("/image/{id}/file")
-    public ResponseEntity<Resource> getImage(@PathVariable String id) {
-        ResourceResult resource = service.getImage(id);
+    @GetMapping("/image/file/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        ResourceResult resource = service.getImage(filename);
         return ResponseEntity.ok()
                 .contentType(resource.type())
                 .body(resource.resource());

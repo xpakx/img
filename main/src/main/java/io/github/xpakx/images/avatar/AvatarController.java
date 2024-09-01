@@ -25,9 +25,9 @@ public class AvatarController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user/{username}/avatar")
-    public ResponseEntity<Resource> getImage(@PathVariable String username) {
-        ResourceResult resource = service.getAvatar(username);
+    @GetMapping("/avatars/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        ResourceResult resource = service.getAvatar(filename);
         return ResponseEntity.ok()
                 .contentType(resource.type())
                 .body(resource.resource());

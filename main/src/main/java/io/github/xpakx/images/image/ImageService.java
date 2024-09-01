@@ -58,6 +58,7 @@ public class ImageService {
         return new ImageData(
                 id,
                 image.getCaption(),
+                image.getImageUrl(),
                 image.getCreatedAt(),
                 image.getUser().getUsername()
         );
@@ -96,6 +97,7 @@ public class ImageService {
         return new ImageData(
                 id,
                 image.getCaption(),
+                image.getImageUrl(),
                 image.getCreatedAt(),
                 username
         );
@@ -109,13 +111,7 @@ public class ImageService {
         return image;
     }
 
-    public ResourceResult getImage(String sqId) {
-        Long id = transformToId(sqId);
-
-        String url = imageRepository
-                .findById(id)
-                .map(Image::getImageUrl)
-                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
+    public ResourceResult getImage(String url) {
         return uploadService.getFile(url);
     }
 
@@ -157,8 +153,10 @@ public class ImageService {
         return new ImageDetails(
                 image.id(),
                 image.caption(),
+                image.imageUrl(),
                 image.createdAt(),
                 image.author(),
+                image.author(), // TODO
                 likes,
                 comments,
                 checkLike(username, id),
@@ -190,6 +188,7 @@ public class ImageService {
         return new ImageData(
                 sqId,
                 result.getCaption(),
+                result.getImageUrl(),
                 result.getCreatedAt(),
                 username
         );

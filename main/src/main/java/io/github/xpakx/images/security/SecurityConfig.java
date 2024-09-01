@@ -54,8 +54,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/authenticate").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/register").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/refresh").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/image/*/file").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user/*/avatar").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/image/file/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/avatars/*").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(
