@@ -33,16 +33,15 @@ public class CommentService {
     @CacheIncrement(value = "commentCountCache", key = "#imageSqId")
     public CommentData addComment(CommentRequest request, String imageSqId, String username) {
         Long imageId = transformToId(imageSqId);
-        Long userId = userRepository
+        var user = userRepository
                 .findByUsername(username)
-                .map(User::getId)
                 .orElseThrow(UserNotFoundException::new);
         Comment comment = new Comment();
-        comment.setAuthor(userRepository.getReferenceById(userId));
+        comment.setAuthor(userRepository.getReferenceById(user.getId()));
         comment.setImage(imageRepository.getReferenceById(imageId));
         comment.setContent(request.content());
         var result = commentRepository.save(comment);
-        return commentToDto(result, username, username);
+        return commentToDto(result, username, username, user.getAvatarUrl());
     }
 
     private Long transformToId(String imageId) {
@@ -76,15 +75,17 @@ public class CommentService {
                 comment.getId(),
                 comment.getContent(),
                 comment.getAuthor().getUsername(),
+                comment.getAuthor().getAvatarUrl(),
                 comment.getAuthor().getUsername().equals(username)
         );
     }
 
-    private CommentData commentToDto(Comment comment, String author, String username) {
+    private CommentData commentToDto(Comment comment, String author, String username, String avatarUrl) {
         return new CommentData(
                 comment.getId(),
                 comment.getContent(),
                 author,
+                avatarUrl,
                 author.equals(username)
         );
     }

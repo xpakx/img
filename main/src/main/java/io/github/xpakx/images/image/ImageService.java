@@ -60,7 +60,8 @@ public class ImageService {
                 image.getCaption(),
                 image.getImageUrl(),
                 image.getCreatedAt(),
-                image.getUser().getUsername()
+                image.getUser().getUsername(),
+                image.getUser().getAvatarUrl()
         );
     }
 
@@ -88,18 +89,19 @@ public class ImageService {
                         .map((image) -> toImageEntity(image, user.getId()))
                         .toList()
         ).stream()
-                .map((img) -> imageToDto(img, username))
+                .map((img) -> imageToDto(img, username, user.getAvatarUrl()))
                 .toList();
     }
 
-    private ImageData imageToDto(Image image, String username) {
+    private ImageData imageToDto(Image image, String username, String avatarUrl) {
         String id = sqids.encode(Collections.singletonList(image.getId()));
         return new ImageData(
                 id,
                 image.getCaption(),
                 image.getImageUrl(),
                 image.getCreatedAt(),
-                username
+                username,
+                avatarUrl
         );
     }
 
@@ -156,7 +158,7 @@ public class ImageService {
                 image.imageUrl(),
                 image.createdAt(),
                 image.author(),
-                image.author(), // TODO
+                image.avatarUrl(),
                 likes,
                 comments,
                 checkLike(username, id),
@@ -190,7 +192,8 @@ public class ImageService {
                 result.getCaption(),
                 result.getImageUrl(),
                 result.getCreatedAt(),
-                username
+                username,
+                image.getUser().getAvatarUrl()
         );
     }
 

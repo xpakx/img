@@ -43,7 +43,8 @@ public class FeedService {
                 image.getCaption(),
                 image.getImageUrl(),
                 image.getCreatedAt(),
-                image.getUser().getUsername()
+                image.getUser().getUsername(),
+                image.getUser().getAvatarUrl()
         );
     }
 

@@ -16,7 +16,8 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     @Query("""
     SELECT new io.github.xpakx.images.search.dto.SearchResult(
       u.username as username,
-      p.description as description
+      p.description as description,
+      u.avatarUrl as avatarUrl
     )
     FROM User u
     LEFT JOIN Profile p ON u.id = p.user.id

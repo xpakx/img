@@ -26,6 +26,8 @@ public class User {
     @JsonIgnore
     private String password;
 
+    private String avatarUrl;
+
     @ManyToMany(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}

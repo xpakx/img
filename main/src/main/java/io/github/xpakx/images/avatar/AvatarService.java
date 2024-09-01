@@ -20,26 +20,18 @@ import java.nio.file.Path;
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
-    private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
     private final UploadService uploadService;
 
     public void uploadAvatar(MultipartFile file, String username) {
-        var user = profileRepository.findByUserUsername(username)
-                .orElseGet(() -> createProfile(username));
-        var name = uploadService.trySaveAvatar(file);
-        user.setAvatarUrl("avatars/" + name);
-        profileRepository.save(user);
-    }
-
-    private Profile createProfile(String username) {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
-        Profile profile = new Profile();
-        profile.setAvatarUrl("avatars/default.jpg");
-        profile.setDescription("");
-        profile.setUser(userRepository.getReferenceById(user.getId()));
-        return profile;
+        var name = uploadService.trySaveAvatar(file);
+        if (!name.isOk()) {
+            throw new RuntimeException("");
+        }
+        user.setAvatarUrl("avatars/" + name.unwrap());
+        userRepository.save(user);
     }
 
     public ResourceResult getAvatar(String username) {
@@ -47,10 +39,10 @@ public class AvatarService {
     }
 
     public void deleteAvatar(String username) {
-        var user = profileRepository.findByUserUsername(username)
+        var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
         uploadService.delete(user.getAvatarUrl());
         user.setAvatarUrl("avatars/default.jpg");
-        profileRepository.save(user);
+        userRepository.save(user);
     }
 }
