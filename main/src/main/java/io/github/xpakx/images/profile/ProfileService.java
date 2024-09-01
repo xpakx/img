@@ -4,7 +4,6 @@ import io.github.xpakx.images.account.User;
 import io.github.xpakx.images.account.UserRepository;
 import io.github.xpakx.images.follow.FollowRepository;
 import io.github.xpakx.images.follow.FollowService;
-import io.github.xpakx.images.image.ImageRepository;
 import io.github.xpakx.images.image.ImageService;
 import io.github.xpakx.images.image.error.UserNotFoundException;
 import io.github.xpakx.images.profile.dto.ProfileData;
@@ -13,7 +12,6 @@ import io.github.xpakx.images.profile.dto.UpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +41,7 @@ public class ProfileService {
                 following,
                 followed,
                 user.username().equals(currentUser),
-                user.avatar()
+                user.avatarUrl()
         );
     }
 
@@ -68,7 +66,7 @@ public class ProfileService {
                 profile.getUser().getId(),
                 profile.getUser().getUsername(),
                 profile.getDescription(),
-                profile.isAvatar()
+                profile.getUser().getAvatarUrl()
         );
     }
 
@@ -77,7 +75,7 @@ public class ProfileService {
                 userId,
                 username,
                 profile.getDescription(),
-                profile.isAvatar()
+                profile.getUser().getAvatarUrl()
         );
     }
 
@@ -86,7 +84,7 @@ public class ProfileService {
                 user.getId(),
                 user.getUsername(),
                 "",
-                false
+                "avatars/default.jpg"
         );
     }
 

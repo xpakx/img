@@ -8,6 +8,6 @@ public record ProfileDetails(
         Long following,
         boolean followed,
         boolean owner,
-        boolean avatar
+        String avatarUrl
 ) {
 }

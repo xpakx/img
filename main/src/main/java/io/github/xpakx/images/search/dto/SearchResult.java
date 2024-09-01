@@ -1,4 +1,4 @@
 package io.github.xpakx.images.search.dto;
 
-public record SearchResult(String username, String description) {
+public record SearchResult(String username, String description, String avatarUrl) {
 }

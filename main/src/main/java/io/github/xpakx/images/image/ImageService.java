@@ -12,6 +12,7 @@ import io.github.xpakx.images.image.dto.ImageDetails;
 import io.github.xpakx.images.image.dto.UpdateImageRequest;
 import io.github.xpakx.images.image.error.*;
 import io.github.xpakx.images.like.LikeService;
+import io.github.xpakx.images.upload.UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
@@ -42,6 +43,7 @@ public class ImageService {
     private final Sqids sqids;
     private final LikeService likeService;
     private final CommentService commentService;
+    private final UploadService uploadService;
 
     public ImageData getBySqId(String sqId) {
         Long id = transformToId(sqId);
@@ -56,8 +58,10 @@ public class ImageService {
         return new ImageData(
                 id,
                 image.getCaption(),
+                image.getImageUrl(),
                 image.getCreatedAt(),
-                image.getUser().getUsername()
+                image.getUser().getUsername(),
+                image.getUser().getAvatarUrl()
         );
     }
 
@@ -74,7 +78,7 @@ public class ImageService {
                 .orElseThrow(UserNotFoundException::new);
         List<Result<String>> results = Arrays
                 .stream(files)
-                .map(this::trySave)
+                .map(uploadService::trySave)
                 .toList();
         System.out.println(results);
         return imageRepository.saveAll(
@@ -85,68 +89,32 @@ public class ImageService {
                         .map((image) -> toImageEntity(image, user.getId()))
                         .toList()
         ).stream()
-                .map((img) -> imageToDto(img, username))
+                .map((img) -> imageToDto(img, username, user.getAvatarUrl()))
                 .toList();
     }
 
-    private ImageData imageToDto(Image image, String username) {
+    private ImageData imageToDto(Image image, String username, String avatarUrl) {
         String id = sqids.encode(Collections.singletonList(image.getId()));
         return new ImageData(
                 id,
                 image.getCaption(),
+                image.getImageUrl(),
                 image.getCreatedAt(),
-                username
+                username,
+                avatarUrl
         );
     }
 
     private Image toImageEntity(String name, Long userId) {
         Image image = new Image();
         //TODO: make image private before editing caption etc.?
-        image.setImageUrl("uploads/" + name);
+        image.setImageUrl(name);
         image.setUser(userRepository.getReferenceById(userId));
         return image;
     }
 
-    private Result<String> trySave(MultipartFile file) {
-        if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
-            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
-        }
-        // TODO: better file structure and check mimetype
-
-        Path root = Path.of("uploads");
-        String name = file.getOriginalFilename();
-        try {
-            if (!Files.exists(root)) {
-                Files.createDirectories(root);
-            }
-            Files.copy(file.getInputStream(), root.resolve(name));
-        } catch (Exception e) {
-            return new Result.Err<>(new CouldNotStoreException("Could not store the file"));
-        }
-        return new Result.Ok<>(name);
-    }
-
-    public ResourceResult getImage(String sqId) {
-        Long id = transformToId(sqId);
-
-        String url = imageRepository
-                .findById(id)
-                .map(Image::getImageUrl)
-                .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
-
-        Path path = Paths.get(url);
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            String typeString = Files.probeContentType(path);
-            MediaType type = switch (typeString) {
-                case "image/jpeg" -> MediaType.IMAGE_JPEG;
-                case "image/png" -> MediaType.IMAGE_PNG;
-                default -> throw  new CannotLoadFileException("Incorrect filetype");
-            };
-            return new ResourceResult(resource, type);
-        } catch (IOException e) {
-            throw new CannotLoadFileException("Cannot load file");
-        }
+    public ResourceResult getImage(String url) {
+        return uploadService.getFile(url);
     }
 
     @CacheDecrement(value = "postCountCache", key = "#username")
@@ -155,16 +123,16 @@ public class ImageService {
                 .orElseThrow(UserNotFoundException::new);
 
         Long id = transformToId(imageId);
-        String imageOwner = imageRepository
+        var image = imageRepository
                 .findById(id)
-                .map((img) -> img.getUser().getUsername())
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
 
-        if(!user.getUsername().equals(imageOwner)) {
+        if(!user.getUsername().equals(image.getUser().getUsername())) {
             throw new NotAnOwnerException("Not an owner");
         }
 
         imageRepository.deleteById(id);
+        uploadService.delete(image.getImageUrl());
     }
 
     private Long transformToId(String imageId) {
@@ -187,8 +155,10 @@ public class ImageService {
         return new ImageDetails(
                 image.id(),
                 image.caption(),
+                image.imageUrl(),
                 image.createdAt(),
                 image.author(),
+                image.avatarUrl(),
                 likes,
                 comments,
                 checkLike(username, id),
@@ -220,8 +190,10 @@ public class ImageService {
         return new ImageData(
                 sqId,
                 result.getCaption(),
+                result.getImageUrl(),
                 result.getCreatedAt(),
-                username
+                username,
+                image.getUser().getAvatarUrl()
         );
     }
 

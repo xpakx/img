@@ -24,19 +24,24 @@ public class PrivateMessageService {
     private final PrivateMessageRepository privateMessageRepository;
 
     public MessageData sendMessage(MessageRequest request, String username) {
-        var senderId = getUserId(username);
-        var receiverId = getUserId(request.recipient());
+        var sender = getUser(username);
+        var receiver = getUser(request.recipient());
         var msg = new PrivateMessage();
         msg.setContent(request.content());
-        msg.setReceiver(userRepository.getReferenceById(receiverId));
-        msg.setSender(userRepository.getReferenceById(senderId));
+        msg.setReceiver(userRepository.getReferenceById(receiver.getId()));
+        msg.setSender(userRepository.getReferenceById(sender.getId()));
         var result = privateMessageRepository.save(msg);
-        return toDto(result, username, request.recipient());
+        return toDto(result, sender, receiver);
     }
 
     private Long getUserId(String username) {
         return userRepository.findByUsername(username)
                 .map(User::getId)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    private User getUser(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
     }
 
@@ -81,12 +86,21 @@ public class PrivateMessageService {
                 message.getId(),
                 message.getContent(),
                 message.getSender().getUsername(),
-                message.getReceiver().getUsername()
+                message.getSender().getAvatarUrl(),
+                message.getReceiver().getUsername(),
+                message.getReceiver().getAvatarUrl()
         );
     }
 
-    private MessageData toDto(PrivateMessage message, String sender, String receiver) {
-        return new MessageData(message.getId(), message.getContent(), sender, receiver);
+    private MessageData toDto(PrivateMessage message, User sender, User receiver) {
+        return new MessageData(
+                message.getId(),
+                message.getContent(),
+                sender.getUsername(),
+                sender.getAvatarUrl(),
+                receiver.getUsername(),
+                receiver.getAvatarUrl()
+        );
     }
 
     private void markAsRead(List<PrivateMessage> messages) {

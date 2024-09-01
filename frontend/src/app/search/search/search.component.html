@@ -2,7 +2,7 @@
 
 @for (profile of profiles; track profile.username) {
 <div class="result">
-    <img class="profile-picture" [src]="apiUrl + '/user/' + profile.username + '/avatar'" alt="Profile Picture">
+    <img class="profile-picture" [src]="apiUrl + '/' + profile.avatarUrl" alt="Profile Picture">
     <a [routerLink]="'/profile/' + profile.username">{{profile.username}}</a>
 </div>
 } @empty {

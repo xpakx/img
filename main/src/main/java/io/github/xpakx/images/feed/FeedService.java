@@ -41,8 +41,10 @@ public class FeedService {
         return new ImageData(
                 id,
                 image.getCaption(),
+                image.getImageUrl(),
                 image.getCreatedAt(),
-                image.getUser().getUsername()
+                image.getUser().getUsername(),
+                image.getUser().getAvatarUrl()
         );
     }
 

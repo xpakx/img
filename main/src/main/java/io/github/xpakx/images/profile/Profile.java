@@ -18,7 +18,6 @@ public class Profile {
     private Long id;
 
     private String description;
-    private boolean avatar;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
