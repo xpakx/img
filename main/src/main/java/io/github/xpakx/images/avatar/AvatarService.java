@@ -36,7 +36,7 @@ public class AvatarService {
         } catch (Exception e) {
             throw new CouldNotStoreException("Could not store the file");
         }
-        user.setAvatar(true);
+        user.setAvatarUrl("avatars/" + username);
         profileRepository.save(user);
     }
 
@@ -44,7 +44,7 @@ public class AvatarService {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
         Profile profile = new Profile();
-        profile.setAvatar(false);
+        profile.setAvatarUrl("avatars/default.jpg");
         profile.setDescription("");
         profile.setUser(userRepository.getReferenceById(user.getId()));
         return profile;
@@ -77,7 +77,7 @@ public class AvatarService {
             throw new RuntimeException("Cannot delete avatar.");
         }
 
-        user.setAvatar(false);
+        user.setAvatarUrl("avatars/default.jpg");
         profileRepository.save(user);
     }
 }

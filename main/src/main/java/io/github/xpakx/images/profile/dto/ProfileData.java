@@ -4,5 +4,5 @@ public record ProfileData(
         Long id,
         String username,
         String description,
-        boolean avatar
+        String avatarUrl
 ) { }

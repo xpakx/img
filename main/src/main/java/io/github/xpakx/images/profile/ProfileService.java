@@ -43,7 +43,7 @@ public class ProfileService {
                 following,
                 followed,
                 user.username().equals(currentUser),
-                user.avatar()
+                user.avatarUrl()
         );
     }
 
@@ -68,7 +68,7 @@ public class ProfileService {
                 profile.getUser().getId(),
                 profile.getUser().getUsername(),
                 profile.getDescription(),
-                profile.isAvatar()
+                profile.getAvatarUrl()
         );
     }
 
@@ -77,7 +77,7 @@ public class ProfileService {
                 userId,
                 username,
                 profile.getDescription(),
-                profile.isAvatar()
+                profile.getAvatarUrl()
         );
     }
 
@@ -86,7 +86,7 @@ public class ProfileService {
                 user.getId(),
                 user.getUsername(),
                 "",
-                false
+                "avatars/default.jpg"
         );
     }
 
