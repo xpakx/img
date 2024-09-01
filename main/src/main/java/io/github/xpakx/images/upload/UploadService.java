@@ -1,9 +1,14 @@
 package io.github.xpakx.images.upload;
 
+import io.github.xpakx.images.common.types.ResourceResult;
 import io.github.xpakx.images.common.types.Result;
+import io.github.xpakx.images.image.error.CannotLoadFileException;
 import io.github.xpakx.images.image.error.CouldNotStoreException;
 import io.github.xpakx.images.image.error.EmptyFilenameException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +60,25 @@ public class UploadService {
             Files.deleteIfExists(root.resolve(url));
         } catch (IOException e) {
             throw new RuntimeException("Cannot delete.");
+        }
+    }
+
+    public ResourceResult getFile(String url) {
+        Path path = root.resolve(url);
+        if(Files.notExists(path)) {
+            path = root.resolve("avatars/default.jpg"); // TODO
+        }
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            String typeString = Files.probeContentType(path);
+            MediaType type = switch (typeString) {
+                case "image/jpeg" -> MediaType.IMAGE_JPEG;
+                case "image/png" -> MediaType.IMAGE_PNG;
+                default -> throw  new CannotLoadFileException("Incorrect filetype");
+            };
+            return new ResourceResult(resource, type);
+        } catch (IOException e) {
+            throw new CannotLoadFileException("Cannot load file");
         }
     }
 }

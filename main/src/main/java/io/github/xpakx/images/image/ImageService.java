@@ -116,20 +116,7 @@ public class ImageService {
                 .findById(id)
                 .map(Image::getImageUrl)
                 .orElseThrow(() -> new ImageNotFoundException("No image with such id"));
-
-        Path path = Paths.get("uploads/" + url);
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            String typeString = Files.probeContentType(path);
-            MediaType type = switch (typeString) {
-                case "image/jpeg" -> MediaType.IMAGE_JPEG;
-                case "image/png" -> MediaType.IMAGE_PNG;
-                default -> throw  new CannotLoadFileException("Incorrect filetype");
-            };
-            return new ResourceResult(resource, type);
-        } catch (IOException e) {
-            throw new CannotLoadFileException("Cannot load file");
-        }
+        return uploadService.getFile(url);
     }
 
     @CacheDecrement(value = "postCountCache", key = "#username")

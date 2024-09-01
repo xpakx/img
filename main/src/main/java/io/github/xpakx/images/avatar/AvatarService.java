@@ -43,17 +43,7 @@ public class AvatarService {
     }
 
     public ResourceResult getAvatar(String username) {
-        Path root = Path.of("uploads/avatars");
-        Path path = root.resolve(username);
-        if(Files.notExists(path)) {
-            path = root.resolve("default.jpg");
-        }
-        try {
-            Resource resource = new UrlResource(path.toUri());
-            return new ResourceResult(resource, MediaType.IMAGE_JPEG);
-        } catch (IOException e) {
-            throw new CannotLoadFileException("Cannot load file");
-        }
+        return uploadService.getFile("avatars/" + username);
     }
 
     public void deleteAvatar(String username) {
