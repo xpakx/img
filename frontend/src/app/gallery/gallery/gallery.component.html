@@ -1,7 +1,7 @@
 <div class="posts-section">
   @for (image of images; track image.id) {
     <div class="post">
-        <img [src]="apiUrl + '/image/' + image.id + '/file'" (click)="openImage(image.id)" (middle)="openImageNew(image.id)">
+        <img [src]="apiUrl + '/image/file/' + image.imageUrl" (click)="openImage(image.id)" (middle)="openImageNew(image.id)">
     </div>
     }
 </div>

@@ -1,6 +1,6 @@
 <div class="container">
-    <div class="photo">
-      <img [src]="apiUrl + '/image/' + id + '/file'">
+    <div class="photo" *ngIf="image">
+      <img [src]="apiUrl + '/image/file/' + image.imageUrl">
     </div>
     <div class="details" *ngIf="image">
         <div class="profile-link">
