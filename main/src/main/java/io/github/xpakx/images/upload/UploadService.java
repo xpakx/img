@@ -96,7 +96,7 @@ public class UploadService {
     public ResourceResult getFile(String url) {
         Path path = root.resolve(url);
         if(Files.notExists(path)) {
-            path = root.resolve("avatars/default.jpg"); // TODO
+            path = getDefault(url);
         }
         try {
             Resource resource = new UrlResource(path.toUri());
@@ -110,5 +110,12 @@ public class UploadService {
         } catch (IOException e) {
             throw new CannotLoadFileException("Cannot load file");
         }
+    }
+
+    private Path getDefault(String url) {
+        if (url.startsWith("avatars/")) {
+            return root.resolve("avatars/default.jpg");
+        }
+        return root.resolve("default.jpg");
     }
 }
