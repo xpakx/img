@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity(name = "User")
@@ -45,4 +46,9 @@ public class User {
             )
     )
     private Set<UserRole> roles;
+
+    @PrePersist
+    protected void onCreate() {
+        this.avatarUrl = "avatars/default.jpg";
+    }
 }
