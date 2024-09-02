@@ -84,7 +84,7 @@ public class ProfileService {
                 user.getId(),
                 user.getUsername(),
                 "",
-                "avatars/default.jpg"
+                user.getAvatarUrl()
         );
     }
 
