@@ -40,35 +40,11 @@ public class UploadService {
     }
 
     private Result<String> trySave(MultipartFile file, Path root) {
-        if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
-            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
+        Result<String> nameResult = createFilename(file);
+        if (!nameResult.isOk()) {
+            return nameResult;
         }
-
-        String fileContentType = file.getContentType();
-        if(fileContentType == null || !acceptedContentTypes.contains(fileContentType)) {
-            return new Result.Err<>(new RuntimeException("Wrong filetype. Must be png or jpg."));
-        }
-
-        String type = switch (fileContentType) {
-            case "image/jpeg" -> "jpg";
-            case "image/png" -> "png";
-            default -> ""; // unreachable
-        };
-
-        String checksum = "";
-        try (InputStream data = file.getInputStream()) {
-            byte[] hash = MessageDigest.getInstance("MD5").digest(data.readAllBytes());
-            checksum = new BigInteger(1, hash).toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            return new Result.Err<>(new RuntimeException("Internal error."));
-        } catch (IOException e) {
-            return new Result.Err<>(new RuntimeException("Could not hash."));
-        }
-        Instant instant = Instant.now();
-        long timeStampMillis = instant.toEpochMilli();
-        String name = String.format("%s%d.%s", checksum, timeStampMillis, type);
-
-        // TODO: better file structure?
+        String name = nameResult.unwrap();
 
         try {
             if (!Files.exists(root)) {
@@ -117,5 +93,35 @@ public class UploadService {
             return root.resolve("avatars/default.jpg");
         }
         return root.resolve("default.jpg");
+    }
+
+    private Result<String> createFilename(MultipartFile file) {
+        if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
+            return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
+        }
+
+        String fileContentType = file.getContentType();
+        if(fileContentType == null || !acceptedContentTypes.contains(fileContentType)) {
+            return new Result.Err<>(new RuntimeException("Wrong filetype. Must be png or jpg."));
+        }
+
+        String type = switch (fileContentType) {
+            case "image/jpeg" -> "jpg";
+            case "image/png" -> "png";
+            default -> ""; // unreachable
+        };
+
+        String checksum = "";
+        try (InputStream data = file.getInputStream()) {
+            byte[] hash = MessageDigest.getInstance("MD5").digest(data.readAllBytes());
+            checksum = new BigInteger(1, hash).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            return new Result.Err<>(new RuntimeException("Internal error."));
+        } catch (IOException e) {
+            return new Result.Err<>(new RuntimeException("Could not hash."));
+        }
+        Instant instant = Instant.now();
+        long timeStampMillis = instant.toEpochMilli();
+        return new Result.Ok<>(String.format("%s%d.%s", checksum, timeStampMillis, type));
     }
 }
