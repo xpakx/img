@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -22,6 +24,7 @@ import java.util.Objects;
 public class UploadService {
     Path root = Path.of("uploads");
     Path avatarRoot = root.resolve("avatars");
+    private static final List<String> acceptedContentTypes = Arrays.asList("image/png", "image/jpeg");
 
     public Result<String> trySave(MultipartFile file) {
         return trySave(file, root);
@@ -37,7 +40,12 @@ public class UploadService {
             return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
         }
 
-        // TODO: better file structure and check mimetype
+        String fileContentType = file.getContentType();
+        if(!acceptedContentTypes.contains(fileContentType)) {
+            return new Result.Err<>(new RuntimeException("Wrong filetype. Must be png or jpg."));
+        }
+
+        // TODO: better file structure?
 
         String name = file.getOriginalFilename();
         try {
