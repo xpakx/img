@@ -13,8 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -35,19 +40,36 @@ public class UploadService {
     }
 
     private Result<String> trySave(MultipartFile file, Path root) {
-        // TODO: name with hash/timestamp?
         if(Objects.isNull(file.getOriginalFilename()) || file.getOriginalFilename().isEmpty()) {
             return new Result.Err<>(new EmptyFilenameException("Filename cannot be empty!"));
         }
 
         String fileContentType = file.getContentType();
-        if(!acceptedContentTypes.contains(fileContentType)) {
+        if(fileContentType == null || !acceptedContentTypes.contains(fileContentType)) {
             return new Result.Err<>(new RuntimeException("Wrong filetype. Must be png or jpg."));
         }
 
+        String type = switch (fileContentType) {
+            case "image/jpeg" -> "jpg";
+            case "image/png" -> "png";
+            default -> ""; // unreachable
+        };
+
+        String checksum = "";
+        try (InputStream data = file.getInputStream()) {
+            byte[] hash = MessageDigest.getInstance("MD5").digest(data.readAllBytes());
+            checksum = new BigInteger(1, hash).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            return new Result.Err<>(new RuntimeException("Internal error."));
+        } catch (IOException e) {
+            return new Result.Err<>(new RuntimeException("Could not hash."));
+        }
+        Instant instant = Instant.now();
+        long timeStampMillis = instant.toEpochMilli();
+        String name = String.format("%s%d.%s", checksum, timeStampMillis, type);
+
         // TODO: better file structure?
 
-        String name = file.getOriginalFilename();
         try {
             if (!Files.exists(root)) {
                 Files.createDirectories(root);
