@@ -1,0 +1,11 @@
+<div class="container">
+  @for (result of results; track result.username) {
+  <div class="result">
+      <img class="profile-picture" [src]="apiUrl + '/' + result.avatarUrl" alt="Profile Picture">
+      <a [routerLink]="'/profile/' + result.username">{{result.username}}</a>
+  </div>
+  } @empty {
+  <p class="empty">No results</p>
+  }
+</div>
+

@@ -2,8 +2,9 @@
     <div class="header-container">
         <div class="logo">Images</div>
         <div class="search-container">
-          <input class="search" type="text" placeholder="Search" (keydown.enter)="search()" #searchInput>
+          <input class="search" type="text" placeholder="Search" (keydown.enter)="search()" (input)="onInputChange()" #searchInput>
           <button class="search-button" (click)="search()">🔍</button>
+          <app-search-panel *ngIf="searchResults" [results]="searchResults"></app-search-panel>
         </div>
         <div class="header-icons" *ngIf="logged">
             <a routerLink="/" class="icon">🏠</a>

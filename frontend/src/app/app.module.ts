@@ -23,6 +23,7 @@ import { MessageListComponent } from './message/message-list/message-list.compon
 import { MessageComponent } from './message/message/message.component';
 import { MessageFormComponent } from './message/message-form/message-form.component';
 import { SearchComponent } from './search/search/search.component';
+import { SearchPanelComponent } from './search/search-panel/search-panel.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -43,6 +44,7 @@ import { SearchComponent } from './search/search/search.component';
         MessageComponent,
         MessageFormComponent,
         SearchComponent,
+        SearchPanelComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
