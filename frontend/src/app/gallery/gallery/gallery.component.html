@@ -3,7 +3,9 @@
     <div class="post">
         <img [src]="apiUrl + '/image/file/' + image.imageUrl" (click)="openImage(image.id)" (middle)="openImageNew(image.id)">
     </div>
-    }
+  } @empty {
+    <p class="empty">No images</p>
+  }
 </div>
 
 <div class="modal-overlay" *ngIf="idForImageModal">
