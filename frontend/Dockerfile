@@ -8,6 +8,6 @@ RUN npm run build --configuration=production
 
 # Run stage
 FROM nginx:alpine
-COPY --from=build app/dist/img/ /usr/share/nginx/html
+COPY --from=build app/dist/img/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.conf.template /etc/nginx/nginx.conf.template
