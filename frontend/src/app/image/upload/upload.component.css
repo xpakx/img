@@ -3,30 +3,31 @@
 }
 
 .option-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 10px;
-  transition: background-color 0.3s;
+    padding: 8px 16px;
+    margin: 10px 5px;
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
 }
 
 .option-button:hover {
-  background-color: #45a049;
+    background-color: #e0e0e0;
 }
 
 .option-button-red {
-  background-color: #f44336;
-}
-
-.option-button-red:hover {
-  background-color: #e53935;
+  background-color: #f66;
+  color: #fff;
+  border: none;
 }
 
 .option-button:disabled {
   background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.option-button-red:disabled {
+  background-color: #f99;
   cursor: not-allowed;
 }

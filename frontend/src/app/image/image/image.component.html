@@ -44,7 +44,7 @@
         @if (showCommentForm) {
         <app-comment [id]="id"></app-comment>
         } @else {
-        <button (click)="setCommentForm(true)">Create comment</button>
+        <button class="option-button" (click)="setCommentForm(true)">Create comment</button>
         }
         @for (comment of comments; track comment.id) {
         <div>
@@ -55,7 +55,7 @@
           <div>
             {{comment.content}}
           </div>
-          @if (comment.owner) {<button (click)="deleteComment(comment.id)">Delete</button>}
+          @if (comment.owner) {<button class="option-button" (click)="deleteComment(comment.id)">Delete</button>}
         </div>
         } @empty {
         <p>No comments yet</p>
