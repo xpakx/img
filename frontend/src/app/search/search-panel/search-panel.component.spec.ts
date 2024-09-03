@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SearchPanelComponent } from './search-panel.component';
+import { provideRouter } from '@angular/router';
 
 describe('SearchPanelComponent', () => {
   let component: SearchPanelComponent;
@@ -8,7 +9,8 @@ describe('SearchPanelComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SearchPanelComponent]
+      declarations: [SearchPanelComponent],
+      providers: [ provideRouter([]) ]
     })
     .compileComponents();
 

@@ -1,9 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { SearchService } from './search/search.service';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
+    const searchServiceSpy = jasmine.createSpyObj('SearchService', ['searchProfile']);
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule
@@ -11,6 +13,9 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
+      providers: [
+        { provide: SearchService, useValue: searchServiceSpy },
+      ]
     }).compileComponents();
   });
 
