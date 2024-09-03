@@ -4,6 +4,7 @@ import { SearchResult } from './search/dto/search-result';
 import { SearchService } from './search/search.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Page } from './gallery/dto/page';
+import { debounceTime, distinctUntilChanged, fromEvent, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -28,14 +29,23 @@ export class AppComponent {
     }
   }
 
-  onInputChange(): void { // TODO
-    console.log("hm");
-    const value = this.searchInput.nativeElement.value;
-    if (value) {
-      this.searchService.searchProfile(value).subscribe({
-        next: (results: Page<SearchResult>) => this.searchResults = results.content,
+  ngAfterViewInit() {
+    fromEvent(this.searchInput.nativeElement, 'input')
+    .pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(() => {
+        const value = this.searchInput.nativeElement.value;
+        if (value) {
+          return this.searchService.searchProfile(value);
+        } else {
+          return [];
+        }
+      })
+    )
+    .subscribe({
+      next: (results: Page<SearchResult>) => (this.searchResults = results.content),
         error: (err: HttpErrorResponse) => console.log(err),
-      });
-    }
+    });
   }
 }
