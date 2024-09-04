@@ -1,0 +1,17 @@
+{
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "dbimg",
+    "database.port": "5432",
+    "database.user": "admin",
+    "database.password": "password",
+    "database.dbname": "img_dev",
+    "database.server.name": "dbimg",
+    "database.history.kafka.bootstrap.servers": "kafka:9092",
+    "database.history.kafka.topic": "schema-changes.stats",
+    "name": "img-db-connector",
+    "topic.prefix": "postgres"
+  },
+  "name": "img-db-connector"
+}
