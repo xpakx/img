@@ -1,11 +1,12 @@
 <section class="page-nav">
 	@if (page >= 2) { <button (click)="open(0)">0</button> }
-	@if (page > 2) { … }
+	@if (page > 2) { <span class="ellipsis">…</span> }
+
 
   @if (page > 0) { <button (click)="open(page-1)">{{page-1}}</button> }
 	<span class="current">{{page}}</span>
   @if (page < pages-1) { <button (click)="open(page+1)">{{page+1}}</button> }
 
-  @if (page < pages-3) { … }
+	@if (page < pages-3) { <span class="ellipsis">…</span> }
   @if (page <= pages-3) { <button (click)="open(pages-1)">{{pages-1}}</button> }
 </section>

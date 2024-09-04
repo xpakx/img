@@ -1,0 +1,49 @@
+.page-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  font-family: Arial, sans-serif;
+}
+
+.page-nav button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+.page-nav button:hover {
+  background-color: #e0e0e0;
+}
+
+.page-nav button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.page-nav .current {
+  padding: 8px 12px;
+  margin: 0 5px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #66f;
+  border-radius: 4px;
+  border: none;
+}
+
+.page-nav span,
+.page-nav button {
+  text-align: center;
+}
+
+.page-nav .ellipsis {
+  margin: 0 5px;
+  font-size: 18px;
+  color: #999;
+  cursor: default;
+}
