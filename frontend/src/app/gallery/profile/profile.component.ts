@@ -20,7 +20,7 @@ export class ProfileComponent implements OnInit {
   username?: String;
   idForImageModal?: String = undefined;
   user?: User;
-  images: Image[] = [];
+  images?: Page<Image>;
 
   constructor(private location: Location, private route: ActivatedRoute, private profileService: ProfileService, private followService: FollowService) { }
 
@@ -38,7 +38,17 @@ export class ProfileComponent implements OnInit {
       error: (err: HttpErrorResponse) => console.log(err),
     });
     this.profileService.getImages(username).subscribe({
-      next: (response: Page<Image>) => this.images = response.content,
+      next: (response: Page<Image>) => this.images = response,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
+
+  getImages(page: number = 0) {
+    if(!this.username) {
+      return
+    }
+    this.profileService.getImages(this.username, page).subscribe({
+      next: (response: Page<Image>) => this.images = response,
       error: (err: HttpErrorResponse) => console.log(err),
     });
   }

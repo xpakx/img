@@ -27,4 +27,10 @@
     }
 </div>
 
-<app-gallery [choice]="idForImageModal" [images]="images" (action)="onGalleryEvent($event)"></app-gallery>
+@if (images) {
+<app-gallery [choice]="idForImageModal" [images]="images.content" (action)="onGalleryEvent($event)"></app-gallery>
+
+<app-pagination [page]="images" (open)="getImages($event)"></app-pagination>
+} @else {
+<p>Loading</p>
+}

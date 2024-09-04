@@ -24,6 +24,7 @@ import { MessageComponent } from './message/message/message.component';
 import { MessageFormComponent } from './message/message-form/message-form.component';
 import { SearchComponent } from './search/search/search.component';
 import { SearchPanelComponent } from './search/search-panel/search-panel.component';
+import { PaginationComponent } from './utils/pagination/pagination.component';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -45,6 +46,7 @@ import { SearchPanelComponent } from './search/search-panel/search-panel.compone
         MessageFormComponent,
         SearchComponent,
         SearchPanelComponent,
+        PaginationComponent,
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         AppRoutingModule,
