@@ -12,8 +12,9 @@ import { environment } from 'src/environments/environment';
   styleUrl: './search.component.css'
 })
 export class SearchComponent implements OnInit {
-  profiles: SearchResult[] = [];
+  profiles?: Page<SearchResult>;
   apiUrl: String = environment.apiUrl;
+  query: String = "";
 
   constructor(private searchService: SearchService, private route: ActivatedRoute) {}
 
@@ -22,11 +23,18 @@ export class SearchComponent implements OnInit {
       if(!params['query']) {
         //TODO: error
       }
+      this.query = params['query'];
       this.searchService.searchProfile(params['query']).subscribe({
-        next: (result: Page<SearchResult>) => this.profiles = result.content,
+        next: (result: Page<SearchResult>) => this.profiles = result,
         error: (err: HttpErrorResponse) => console.log(err),
       });
     });
   }
 
+  getProfiles(page: number = 0) {
+    this.searchService.searchProfile(this.query, page).subscribe({
+      next: (response: Page<SearchResult>) => this.profiles = response,
+      error: (err: HttpErrorResponse) => console.log(err),
+    });
+  }
 }

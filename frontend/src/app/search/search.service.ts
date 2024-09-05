@@ -18,7 +18,7 @@ export class SearchService {
     return new HttpHeaders({'Authorization' : `Bearer ${token}`});
   }
 
-  public searchProfile(query: String, page: number = 0): Observable<Page<SearchResult>> {
-    return this.http.get<Page<SearchResult>>(`${this.apiServerUrl}/search?query=${query}&page=${page}`, { headers: this.getHeaders() });
+  public searchProfile(query: String, page: number = 0, short: boolean = false): Observable<Page<SearchResult>> {
+    return this.http.get<Page<SearchResult>>(`${this.apiServerUrl}/search?query=${query}&page=${page}${short ? "&short=true" : ""}`, { headers: this.getHeaders() });
   }
 }

@@ -37,7 +37,7 @@ export class AppComponent {
       switchMap(() => {
         const value = this.searchInput.nativeElement.value;
         if (value) {
-          return this.searchService.searchProfile(value);
+          return this.searchService.searchProfile(value, 0, true);
         } else {
           return [];
         }
