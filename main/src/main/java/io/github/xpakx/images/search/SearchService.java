@@ -16,7 +16,6 @@ public class SearchService {
 
     public Page<SearchResult> searchProfile(String searchString, int page, boolean shortList) {
         Pageable pageable = PageRequest.of(page, shortList ? 10 : 25);
-        System.out.println(shortList ? "Short list" : "Long list");
         return profileRepository.
                 findByUserUsernameContaining(searchString, pageable);
     }

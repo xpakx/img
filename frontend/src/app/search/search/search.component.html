@@ -1,11 +1,16 @@
 <h1>Search result</h1>
 
-@for (profile of profiles; track profile.username) {
-<div class="result">
-    <img class="profile-picture" [src]="apiUrl + '/' + profile.avatarUrl" alt="Profile Picture">
-    <a [routerLink]="'/profile/' + profile.username">{{profile.username}}</a>
-</div>
-} @empty {
-<p>No results</p>
-}
+@if (profiles) {
+  @for (profile of profiles.content; track profile.username) {
+  <div class="result">
+      <img class="profile-picture" [src]="apiUrl + '/' + profile.avatarUrl" alt="Profile Picture">
+      <a [routerLink]="'/profile/' + profile.username">{{profile.username}}</a>
+  </div>
 
+  <app-pagination [page]="profiles" (open)="getProfiles($event)"></app-pagination>
+  } @empty {
+  <p>No results</p>
+  }
+} @else {
+  <p>Loading</p>
+}
