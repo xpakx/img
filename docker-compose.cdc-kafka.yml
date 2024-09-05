@@ -31,6 +31,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
   frontend:
     container_name: image_frontend
     build: 
@@ -99,6 +103,8 @@ services:
         condition: service_healthy
     ports:
       - '8083:8083'
+    expose:
+      - 8083
     environment:
       BOOTSTRAP_SERVERS: kafka:29092
       GROUP_ID: 1
