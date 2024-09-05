@@ -11,7 +11,11 @@ public class SearchController {
     private final SearchService service;
 
     @GetMapping("/search")
-    public Page<SearchResult> searchUsers(@RequestParam String query, @RequestParam int page) {
-        return service.searchProfile(query, page);
+    public Page<SearchResult> searchUsers(
+            @RequestParam String query,
+            @RequestParam int page,
+            @RequestParam(name = "short", required = false, defaultValue = "false") boolean shortList
+    ) {
+        return service.searchProfile(query, page, shortList);
     }
 }
