@@ -16,7 +16,7 @@ public enum TableName {
     public Class<?> getType() {
         return switch (this) {
             case Account -> io.github.xpakx.images_cdc.debezium.model.Account.class;
-            case Image -> Object.class;
+            case Image -> io.github.xpakx.images_cdc.debezium.model.Image.class;
         };
     }
 }
