@@ -60,3 +60,15 @@ services:
       - 8080
     environment:
       - SPRING_PROFILES_ACTIVE=embedded
+      - SPRING_CASSANDRA_CONTACTPOINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_DATA_CASSANDRA_USERNAME=admin
+      - SPRING_DATA_CASSANDRA_PASSWORD=admin
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-container
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
