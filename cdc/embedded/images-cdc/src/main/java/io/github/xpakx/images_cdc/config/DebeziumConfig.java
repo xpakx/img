@@ -3,12 +3,14 @@ package io.github.xpakx.images_cdc.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Profile("embedded")
 public class DebeziumConfig {
     @Value("${debezium.name}")
     private String name;
