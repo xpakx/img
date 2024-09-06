@@ -56,6 +56,8 @@ services:
     depends_on:
       dbimg:
         condition: service_healthy
+      cassandra:
+        condition: service_healthy
     expose:
       - 8080
     environment:
@@ -64,6 +66,8 @@ services:
       - SPRING_CASSANDRA_PORT=9042
       - SPRING_DATA_CASSANDRA_USERNAME=admin
       - SPRING_DATA_CASSANDRA_PASSWORD=admin
+      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
+      - SPRING_CASSANDRA_KEYSPACE-NAME=images_cassandra
   cassandra:
     image: cassandra:latest
     container_name: cassandra-container
@@ -72,3 +76,8 @@ services:
     environment:
       - CASSANDRA_USER=admin
       - CASSANDRA_PASSWORD=admin
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 50

@@ -8,6 +8,8 @@ import io.debezium.config.Configuration;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
+import io.github.xpakx.images_cdc.data.Event;
+import io.github.xpakx.images_cdc.data.EventService;
 import io.github.xpakx.images_cdc.debezium.model.Account;
 import io.github.xpakx.images_cdc.debezium.model.Key;
 import io.github.xpakx.images_cdc.debezium.model.TableName;
@@ -27,14 +29,17 @@ import java.util.concurrent.Executors;
 public class DebeziumListener {
     private final Executor executor;
     private final DebeziumEngine<ChangeEvent<String, String>> debeziumEngine;
+    private final EventService service;
 
-    public DebeziumListener(Configuration postgresConnector) {
+    public DebeziumListener(Configuration postgresConnector, EventService service) {
         this.executor = Executors.newSingleThreadExecutor();
 
         this.debeziumEngine = DebeziumEngine.create(Json.class)
                 .using(postgresConnector.asProperties())
                 .notifying(this::handleEvent)
                 .build();
+
+        this.service = service;
     }
 
     private void handleEvent(ChangeEvent<String, String> event) {
@@ -48,6 +53,7 @@ public class DebeziumListener {
         System.out.println("Key: " + key);
         var valueOpt = parseValue(event.value(), key.table().getType());
         System.out.println("Value: " + valueOpt);
+        service.saveUser((Value<Account>) valueOpt.get());
     }
 
     private Optional<Key> parseKey(String key) {
