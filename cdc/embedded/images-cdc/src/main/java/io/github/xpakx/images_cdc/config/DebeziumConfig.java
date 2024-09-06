@@ -53,6 +53,10 @@ public class DebeziumConfig {
         configMap.put("database.dbname", dbName);
         configMap.put("plugin.name", pluginName);
 
+        configMap.put("include.schema.changes", "false");
+        configMap.put("schema.include.list", "public");
+        configMap.put("table.include.list", "public.account,public.image");
+
         configMap.put("topic.prefix", prefix);
 
         return io.debezium.config.Configuration.from(configMap);
