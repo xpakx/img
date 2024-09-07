@@ -13,13 +13,6 @@ export class LogService {
   constructor(private httpClient: HttpClient) { }
 
   getEvents(): Observable<LogEvent[]> {
-    return of([
-      {id: "1111"},
-      {id: "aaaa"},
-    ]);
-  }
-
-  getEventsReal(): Observable<LogEvent[]> {
     return this.httpClient.get<LogEvent[]>(this.apiUrl + "/events");
   }
 }
