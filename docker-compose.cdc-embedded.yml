@@ -50,7 +50,7 @@ services:
     command: /bin/sh -c "envsubst '$${API_URL} $${API_PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
   cdc:
     build: 
-      context: ./cdc/embedded/images-cdc//
+      context: ./cdc/embedded/images-cdc/
       dockerfile: Dockerfile
     container_name: image_cdc
     depends_on:
@@ -62,6 +62,8 @@ services:
         condition: service_completed_successfully
     expose:
       - 8080
+    ports:
+      - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=embedded
       - SPRING_CASSANDRA_CONTACTPOINTS=cassandra
@@ -92,3 +94,12 @@ services:
     entrypoint: ["/usr/bin/bash", "-e", "/init.sh"]
     volumes:
       - ./cdc/embedded/cassandra-config/init.sh:/init.sh:z
+  logs:
+    container_name: image_logs
+    build: 
+      context: ./cdc/embedded/images-logs
+      dockerfile: Dockerfile
+    depends_on:
+      - cdc
+    ports:
+      - "8001:80"
