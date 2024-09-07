@@ -3,12 +3,14 @@ package io.github.xpakx.images_cdc.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Profile("embedded")
 public class DebeziumConfig {
     @Value("${debezium.name}")
     private String name;
@@ -50,6 +52,10 @@ public class DebeziumConfig {
         configMap.put("database.password", postgresPassword);
         configMap.put("database.dbname", dbName);
         configMap.put("plugin.name", pluginName);
+
+        configMap.put("include.schema.changes", "false");
+        configMap.put("schema.include.list", "public");
+        configMap.put("table.include.list", "public.account,public.image");
 
         configMap.put("topic.prefix", prefix);
 
