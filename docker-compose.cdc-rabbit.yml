@@ -62,9 +62,65 @@ services:
     image: debezium/server:2.4
     container_name: debezium-server
     ports:
-      - 8081:8080
+      - 8082:8080
     volumes:
       - ./cdc/rabbit/conf:/debezium/conf:z
     depends_on:
       - rabbitmq
       - dbimg
+ 
+  cdc:
+    build: 
+      context: ./cdc/embedded/images-cdc/
+      dockerfile: Dockerfile
+    container_name: image_cdc
+    depends_on:
+      dbimg:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+    expose:
+      - 8080
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=rabbit
+      - SPRING_CASSANDRA_CONTACTPOINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_DATA_CASSANDRA_USERNAME=admin
+      - SPRING_DATA_CASSANDRA_PASSWORD=admin
+      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
+      - SPRING_CASSANDRA_KEYSPACE-NAME=images_cassandra
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-container
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+        cassandra:
+          condition: service_healthy
+    restart: "no"
+    entrypoint: ["/usr/bin/bash", "-e", "/init.sh"]
+    volumes:
+      - ./cdc/embedded/cassandra-config/init.sh:/init.sh:z
+  logs:
+    container_name: image_logs
+    build: 
+      context: ./cdc/embedded/images-logs
+      dockerfile: Dockerfile
+    depends_on:
+      - cdc
+    ports:
+      - "8001:80"
