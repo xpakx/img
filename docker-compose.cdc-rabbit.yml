@@ -58,17 +58,11 @@ services:
       RABBITMQ_DEFAULT_USER: rabbit
       RABBITMQ_DEFAULT_PASS: password
       RABBITMQ_DEFAULT_VHOST: /
-  debezium:
-    image: debezium/server:2.4
-    container_name: debezium-server
-    ports:
-      - 8082:8080
-    volumes:
-      - ./cdc/rabbit/conf:/debezium/conf:z
-    depends_on:
-      - rabbitmq
-      - dbimg
- 
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   cdc:
     build: 
       context: ./cdc/embedded/images-cdc/
@@ -124,3 +118,28 @@ services:
       - cdc
     ports:
       - "8001:80"
+  rabbit-init:
+    image: alpine/curl:latest
+    depends_on:
+        rabbitmq:
+          condition: service_healthy
+    restart: "no"
+    entrypoint: ["sh", "-e", "/init.sh"]
+    volumes:
+      - ./cdc/rabbit/init.sh:/init.sh:z
+
+  debezium:
+    image: debezium/server:2.4
+    container_name: debezium-server
+    ports:
+      - 8082:8080
+    volumes:
+      - ./cdc/rabbit/conf:/debezium/conf:z
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      dbimg:
+        condition: service_healthy
+      rabbit-init:
+        condition: service_completed_successfully
+ 
