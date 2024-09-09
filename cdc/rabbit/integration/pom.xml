@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.github.xpakx</groupId>
-	<artifactId>images-cdc</artifactId>
+	<artifactId>images-integration</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>images-cdc</name>
-	<description>Images CDC sandbox</description>
+	<name>images-integration</name>
+	<description>Integration for CDC</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,7 +32,20 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
+			<artifactId>spring-boot-starter-integration</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-amqp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
 		<dependency>
@@ -40,37 +53,10 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>io.debezium</groupId>
-			<artifactId>debezium-api</artifactId>
-			<version>2.5.2.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>io.debezium</groupId>
-			<artifactId>debezium-embedded</artifactId>
-			<version>2.5.2.Final</version>
-		</dependency>
-		<dependency>
-			<groupId>io.debezium</groupId>
-			<artifactId>debezium-connector-postgres</artifactId>
-			<version>2.5.2.Final</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-cassandra</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<version>3.3.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-amqp</artifactId>
+			<groupId>org.springframework.integration</groupId>
+			<artifactId>spring-integration-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
