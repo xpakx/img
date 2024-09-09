@@ -143,3 +143,17 @@ services:
       rabbit-init:
         condition: service_completed_successfully
  
+  integration:
+    build: 
+      context: ./cdc/rabbit/integration
+      dockerfile: Dockerfile
+    container_name: image_integration
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      rabbit-init:
+        condition: service_completed_successfully
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=password
+      - SPRING_RABBITMQ_USERNAME=rabbit
