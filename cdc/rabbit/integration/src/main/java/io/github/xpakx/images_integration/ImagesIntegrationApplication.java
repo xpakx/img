@@ -1,5 +1,6 @@
 package io.github.xpakx.images_integration;
 
+import io.github.xpakx.images_integration.config.CustomAmqpHeaderMapper;
 import io.github.xpakx.images_integration.transformation.StringToEventTransformer;
 import io.github.xpakx.images_integration.transformation.model.Event;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -15,7 +16,7 @@ import org.springframework.integration.dsl.QueueChannelSpec;
 import org.springframework.integration.dsl.Transformers;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.support.MessageBuilder;
-import org.springframework.messaging.Message;
+
 
 @SpringBootApplication
 public class ImagesIntegrationApplication {
@@ -57,6 +58,7 @@ public class ImagesIntegrationApplication {
 						Amqp.outboundAdapter(template)
 								.exchangeName(resultExchange)
 								.routingKeyFunction(m-> m.getHeaders().get("routingKey", String.class))
+								.headerMapper(new CustomAmqpHeaderMapper())
 				)
 				.get();
 	}
