@@ -75,6 +75,10 @@ services:
         condition: service_healthy
       cassandra-init:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+      rabbit-init:
+        condition: service_completed_successfully
     expose:
       - 8080
     ports:
@@ -87,6 +91,9 @@ services:
       - SPRING_DATA_CASSANDRA_PASSWORD=admin
       - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
       - SPRING_CASSANDRA_KEYSPACE-NAME=images_cassandra
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=password
+      - SPRING_RABBITMQ_USERNAME=rabbit
   cassandra:
     image: cassandra:latest
     container_name: cassandra-container
