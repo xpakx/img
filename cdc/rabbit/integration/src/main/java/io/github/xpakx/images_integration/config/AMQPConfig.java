@@ -26,4 +26,11 @@ public class AMQPConfig {
                 .bind(changeQueue)
                 .to(changeExchange).with("change").noargs();
     }
+
+    @Bean
+    Exchange eventExchange(@Value("${rabbitmq.exchange.out}") String eventExchangeName) {
+        return ExchangeBuilder.topicExchange(eventExchangeName)
+                .durable(true)
+                .build();
+    }
 }
