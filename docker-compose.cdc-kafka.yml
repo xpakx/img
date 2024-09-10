@@ -77,7 +77,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -210,18 +210,11 @@ services:
     volumes:
       - ./cdc/kafka/:/init:z
 
- 
-  integration:
-    build: 
-      context: ./cdc/rabbit/integration
-      dockerfile: Dockerfile
-    container_name: image_integration
-    depends_on:
-      debezium:
-        condition: service_healthy
-      debezium-init:
-        condition: service_completed_successfully
-    environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PASSWORD=password
-      - SPRING_RABBITMQ_USERNAME=rabbit
+  kafdrop:
+      image: obsidiandynamics/kafdrop:latest
+      depends_on:
+        - kafka
+      ports:
+        - 19000:9000
+      environment:
+        KAFKA_BROKERCONNECT: kafka:29092
