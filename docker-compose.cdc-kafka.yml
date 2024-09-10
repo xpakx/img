@@ -128,7 +128,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - '8081:8081'
+      - '8084:8081'
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
@@ -138,3 +138,75 @@ services:
       interval: 10s
       retries: 20
       test: curl --user superUser:superUser --fail --silent --insecure http://localhost:8081/subjects --output /dev/null || exit 1
+
+
+  cdc:
+    build: 
+      context: ./cdc/embedded/images-cdc/
+      dockerfile: Dockerfile
+    container_name: image_cdc
+    depends_on:
+      dbimg:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+      debezium:
+        condition: service_healthy
+    expose:
+      - 8080
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=kafka
+      - SPRING_CASSANDRA_CONTACTPOINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_DATA_CASSANDRA_USERNAME=admin
+      - SPRING_DATA_CASSANDRA_PASSWORD=admin
+      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
+      - SPRING_CASSANDRA_KEYSPACE-NAME=images_cassandra
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-container
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+        cassandra:
+          condition: service_healthy
+    restart: "no"
+    entrypoint: ["/usr/bin/bash", "-e", "/init.sh"]
+    volumes:
+      - ./cdc/embedded/cassandra-config/init.sh:/init.sh:z
+  logs:
+    container_name: image_logs
+    build: 
+      context: ./cdc/embedded/images-logs
+      dockerfile: Dockerfile
+    depends_on:
+      - cdc
+    ports:
+      - "8001:80"
+ 
+  integration:
+    build: 
+      context: ./cdc/rabbit/integration
+      dockerfile: Dockerfile
+    container_name: image_integration
+    depends_on:
+      debezium:
+        condition: service_healthy
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=password
+      - SPRING_RABBITMQ_USERNAME=rabbit
