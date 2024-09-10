@@ -11,7 +11,8 @@
     "database.history.kafka.bootstrap.servers": "kafka:9092",
     "database.history.kafka.topic": "schema-changes.stats",
     "name": "img-db-connector",
-    "topic.prefix": "postgres"
+    "topic.prefix": "postgres",
+    "plugin.name": "pgoutput"
   },
   "name": "img-db-connector"
 }

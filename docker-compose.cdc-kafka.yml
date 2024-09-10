@@ -77,7 +77,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -128,7 +128,7 @@ services:
       kafka:
         condition: service_healthy
     ports:
-      - '8081:8081'
+      - '8084:8081'
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
@@ -138,3 +138,83 @@ services:
       interval: 10s
       retries: 20
       test: curl --user superUser:superUser --fail --silent --insecure http://localhost:8081/subjects --output /dev/null || exit 1
+
+
+  cdc:
+    build: 
+      context: ./cdc/embedded/images-cdc/
+      dockerfile: Dockerfile
+    container_name: image_cdc
+    depends_on:
+      dbimg:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+      debezium:
+        condition: service_healthy
+      debezium-init:
+        condition: service_completed_successfully
+    expose:
+      - 8080
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=kafka
+      - SPRING_CASSANDRA_CONTACTPOINTS=cassandra
+      - SPRING_CASSANDRA_PORT=9042
+      - SPRING_DATA_CASSANDRA_USERNAME=admin
+      - SPRING_DATA_CASSANDRA_PASSWORD=admin
+      - SPRING_CASSANDRA_LOCAL-DATACENTER=datacenter1
+      - SPRING_CASSANDRA_KEYSPACE-NAME=images_cassandra
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra-container
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 50
+  cassandra-init:
+    image: cassandra:latest
+    depends_on:
+        cassandra:
+          condition: service_healthy
+    restart: "no"
+    entrypoint: ["/usr/bin/bash", "-e", "/init.sh"]
+    volumes:
+      - ./cdc/embedded/cassandra-config/init.sh:/init.sh:z
+  logs:
+    container_name: image_logs
+    build: 
+      context: ./cdc/embedded/images-logs
+      dockerfile: Dockerfile
+    depends_on:
+      - cdc
+    ports:
+      - "8001:80"
+
+  debezium-init:
+    image: alpine/curl:latest
+    depends_on:
+      debezium:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["sh", "-e", "init/send_connector.sh"]
+    volumes:
+      - ./cdc/kafka/:/init:z
+
+  kafdrop:
+      image: obsidiandynamics/kafdrop:latest
+      depends_on:
+        - kafka
+      ports:
+        - 19000:9000
+      environment:
+        KAFKA_BROKERCONNECT: kafka:29092
