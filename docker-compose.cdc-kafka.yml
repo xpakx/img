@@ -154,6 +154,8 @@ services:
         condition: service_completed_successfully
       debezium:
         condition: service_healthy
+      debezium-init:
+        condition: service_completed_successfully
     expose:
       - 8080
     ports:
@@ -197,6 +199,17 @@ services:
       - cdc
     ports:
       - "8001:80"
+
+  debezium-init:
+    image: alpine/curl:latest
+    depends_on:
+      debezium:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["sh", "-e", "init/send_connector.sh"]
+    volumes:
+      - ./cdc/kafka/:/init:z
+
  
   integration:
     build: 
@@ -206,6 +219,8 @@ services:
     depends_on:
       debezium:
         condition: service_healthy
+      debezium-init:
+        condition: service_completed_successfully
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PASSWORD=password
