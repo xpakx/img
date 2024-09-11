@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.xpakx.images_integration.transformation.model.Account;
 import io.github.xpakx.images_integration.transformation.model.Event;
 import io.github.xpakx.images_integration.transformation.model.Image;
+import io.github.xpakx.images_integration.transformation.model.Operation;
 import org.springframework.integration.transformer.AbstractPayloadTransformer;
 import org.springframework.stereotype.Service;
 
@@ -30,13 +31,14 @@ public class StringToEventTransformer extends AbstractPayloadTransformer<String,
             }
             var clazz = clazzOpt.get();
             JsonNode payloadNode = value.path("payload");
+            Operation operation = Operation.toOp(payloadNode.path("op").asText());
 
             System.out.println(payloadNode.toString());
             var before = objectMapper
                     .treeToValue(payloadNode.path("before"), clazz);
             var after = objectMapper
                     .treeToValue(payloadNode.path("after"), clazz);
-            return new Event<>(before, after, schemaNameToRoutingKey(schemaName));
+            return new Event<>(before, after, operation, schemaNameToRoutingKey(schemaName));
         } catch (Exception e) {
             System.out.println("Cannot parse");
         }
