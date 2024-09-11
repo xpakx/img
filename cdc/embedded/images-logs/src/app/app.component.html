@@ -1,5 +1,9 @@
 @for (event of events; track event.id) {
-{{event.id}} {{event.name}} {{event.user_id}}
+<div class="event">
+  <div class="event-id">{{event.id}}</div>
+  <div class="event-name">{{event.name}}</div>
+  <div class="event-actor">user id: {{event.userId}}</div>
+</div>
 } @empty {
 <p>No items</p>
 }

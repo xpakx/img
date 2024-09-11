@@ -2,11 +2,14 @@ package io.github.xpakx.images_cdc.data;
 
 import io.github.xpakx.images_cdc.data.dto.EventData;
 import io.github.xpakx.images_cdc.debezium.model.Account;
+import io.github.xpakx.images_cdc.debezium.model.Image;
 import io.github.xpakx.images_cdc.debezium.model.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.StreamSupport;
 
@@ -19,8 +22,45 @@ public class EventService {
     }
 
     public void saveUser(Value<Account> user) {
-        var event = new Event(UUID.randomUUID(), "created", user.after().id());
-        repository.save(event);
+        switch (user.operation()) {
+            case Create ->
+                    repository.save(createUserEvent(user.after(), "account_created"));
+            case Delete ->
+                    repository.save(createUserEvent(user.before(), "account_deleted"));
+            case Update ->
+                    repository.save(createUserEvent(user.after(), "avatar_changed"));
+            default -> {}
+        }
+    }
+
+    private Event createUserEvent(Account user, String eventName) {
+        return new Event(
+                UUID.randomUUID(),
+                eventName,
+                user.id(),
+                Instant.now()
+        );
+    }
+
+    public void saveImage(Value<Image> image) {
+        switch (image.operation()) {
+            case Create ->
+                    repository.save(createImageEvent(image.after(), "image_created"));
+            case Delete ->
+                    repository.save(createImageEvent(image.before(), "image_deleted"));
+            case Update ->
+                    repository.save(createImageEvent(image.after(), "caption_changed"));
+            default -> {}
+        }
+    }
+
+    private Event createImageEvent(Image image, String eventName) {
+        return new Event(
+                UUID.randomUUID(),
+                eventName,
+                image.userId(),
+                Instant.now()
+        );
     }
 
     public List<EventData> getEvents(Long userId) {
@@ -41,5 +81,17 @@ public class EventService {
 
     private EventData toData(Event event) {
         return new EventData(event.getId(), event.getName(), event.getUserId());
+    }
+
+    private boolean avatarChanged(Value<Account> user) {
+        Objects.requireNonNull(user.after());
+        Objects.requireNonNull(user.before());
+        return !user.after().avatarUrl().equals(user.before().avatarUrl());
+    }
+
+    private boolean captionChanged(Value<Image> image) {
+        Objects.requireNonNull(image.after());
+        Objects.requireNonNull(image.before());
+        return !image.after().caption().equals(image.before().caption());
     }
 }

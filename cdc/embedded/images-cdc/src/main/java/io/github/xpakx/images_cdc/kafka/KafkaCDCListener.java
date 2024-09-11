@@ -4,13 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.xpakx.images_cdc.data.EventService;
 import io.github.xpakx.images_cdc.debezium.model.Account;
 import io.github.xpakx.images_cdc.debezium.model.Image;
+import io.github.xpakx.images_cdc.debezium.model.Operation;
 import io.github.xpakx.images_cdc.debezium.model.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
+@Profile("kafka")
 public class KafkaCDCListener {
     public final EventService service;
 
@@ -28,6 +31,8 @@ public class KafkaCDCListener {
     @KafkaListener(topics = "${kafka.image.topic}", groupId = "${spring.kafka.consumer.group-id}")
     public void listenImages(String message) {
         System.out.println("Received image event: " + message);
+        parseValue(message, Image.class)
+                .ifPresent(service::saveImage);
     }
 
     private <T> Optional<Value<T>> parseValue(String value, Class<T> clazz) {
@@ -44,13 +49,14 @@ public class KafkaCDCListener {
             }
 
             JsonNode payloadNode = valueNode.path("payload");
+            Operation operation = Operation.toOp(payloadNode.path("op").asText());
 
             T before = objectMapper
                     .treeToValue(payloadNode.path("before"), clazz);
             T after = objectMapper
                     .treeToValue(payloadNode.path("after"), clazz);
 
-            return Optional.of(new Value<>(before, after));
+            return Optional.of(new Value<>(before, after, operation));
         } catch (Exception e) {
             e.printStackTrace();
         }
