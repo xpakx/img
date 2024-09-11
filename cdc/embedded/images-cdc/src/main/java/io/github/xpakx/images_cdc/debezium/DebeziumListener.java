@@ -10,10 +10,7 @@ import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
 import io.github.xpakx.images_cdc.data.Event;
 import io.github.xpakx.images_cdc.data.EventService;
-import io.github.xpakx.images_cdc.debezium.model.Account;
-import io.github.xpakx.images_cdc.debezium.model.Key;
-import io.github.xpakx.images_cdc.debezium.model.TableName;
-import io.github.xpakx.images_cdc.debezium.model.Value;
+import io.github.xpakx.images_cdc.debezium.model.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Profile;
@@ -53,7 +50,10 @@ public class DebeziumListener {
         System.out.println("Key: " + key);
         var valueOpt = parseValue(event.value(), key.table().getType());
         System.out.println("Value: " + valueOpt);
-        service.saveUser((Value<Account>) valueOpt.get());
+        switch (key.table()) {
+            case Account -> service.saveUser((Value<Account>) valueOpt.get());
+            case Image -> service.saveImage((Value<Image>) valueOpt.get());
+        }
     }
 
     private Optional<Key> parseKey(String key) {

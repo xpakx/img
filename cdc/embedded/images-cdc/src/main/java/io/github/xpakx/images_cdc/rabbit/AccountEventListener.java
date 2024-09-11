@@ -2,6 +2,7 @@ package io.github.xpakx.images_cdc.rabbit;
 
 import io.github.xpakx.images_cdc.data.EventService;
 import io.github.xpakx.images_cdc.debezium.model.Account;
+import io.github.xpakx.images_cdc.debezium.model.Image;
 import io.github.xpakx.images_cdc.debezium.model.Value;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,6 +22,15 @@ public class AccountEventListener {
     void handleAccount(final Value<Account> event) {
         try {
             service.saveUser(event);
+        } catch (final Exception e) {
+            throw new AmqpRejectAndDontRequeueException(e);
+        }
+    }
+
+    @RabbitListener(queues = "${amqp.queue.image}")
+    void handleImage(final Value<Image> event) {
+        try {
+            service.saveImage(event);
         } catch (final Exception e) {
             throw new AmqpRejectAndDontRequeueException(e);
         }

@@ -8,6 +8,6 @@ public record Image(
         Long id,
         @JsonProperty("image_url") String imageUrl,
         String caption,
-        @JsonProperty("user_id") String userId
+        @JsonProperty("user_id") Long userId
         ) {
 }
