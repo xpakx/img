@@ -6,6 +6,7 @@ import io.github.xpakx.images_cdc.debezium.model.Image;
 import io.github.xpakx.images_cdc.debezium.model.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -36,7 +37,8 @@ public class EventService {
         return new Event(
                 UUID.randomUUID(),
                 eventName,
-                user.id()
+                user.id(),
+                Instant.now()
         );
     }
 
@@ -56,7 +58,8 @@ public class EventService {
         return new Event(
                 UUID.randomUUID(),
                 eventName,
-                image.userId()
+                image.userId(),
+                Instant.now()
         );
     }
 
