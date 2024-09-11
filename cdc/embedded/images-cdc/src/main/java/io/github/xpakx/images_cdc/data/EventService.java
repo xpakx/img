@@ -21,12 +21,14 @@ public class EventService {
     }
 
     public void saveUser(Value<Account> user) {
-        if (user.before() == null) {
-            repository.save(createUserEvent(user.after(), "account_created"));
-        } else if (user.after() == null)  {
-            repository.save(createUserEvent(user.before(), "account_deleted"));
-        } else if (avatarChanged(user)) {
-            repository.save(createUserEvent(user.after(), "avatar_changed"));
+        switch (user.operation()) {
+            case Create ->
+                    repository.save(createUserEvent(user.after(), "account_created"));
+            case Delete ->
+                    repository.save(createUserEvent(user.before(), "account_deleted"));
+            case Update ->
+                    repository.save(createUserEvent(user.after(), "avatar_changed"));
+            default -> {}
         }
     }
 
@@ -39,12 +41,14 @@ public class EventService {
     }
 
     public void saveImage(Value<Image> image) {
-        if (image.before() == null) {
-            repository.save(createImageEvent(image.after(), "image_created"));
-        } else if (image.after() == null)  {
-            repository.save(createImageEvent(image.before(), "image_deleted"));
-        } else if (captionChanged(image)) {
-            repository.save(createImageEvent(image.after(), "caption_changed"));
+        switch (image.operation()) {
+            case Create ->
+                    repository.save(createImageEvent(image.after(), "image_created"));
+            case Delete ->
+                    repository.save(createImageEvent(image.before(), "image_deleted"));
+            case Update ->
+                    repository.save(createImageEvent(image.after(), "caption_changed"));
+            default -> {}
         }
     }
 

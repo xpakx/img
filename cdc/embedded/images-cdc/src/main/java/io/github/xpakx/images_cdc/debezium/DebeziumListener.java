@@ -47,9 +47,13 @@ public class DebeziumListener {
         }
         var key = keyOpt.get();
 
+        System.out.println(event.value());
         System.out.println("Key: " + key);
         var valueOpt = parseValue(event.value(), key.table().getType());
         System.out.println("Value: " + valueOpt);
+        if(valueOpt.isEmpty()) {
+            return;
+        }
         switch (key.table()) {
             case Account -> service.saveUser((Value<Account>) valueOpt.get());
             case Image -> service.saveImage((Value<Image>) valueOpt.get());
@@ -75,17 +79,22 @@ public class DebeziumListener {
     }
 
     private <T> Optional<Value<T>> parseValue(String value, Class<T> clazz) {
+        if (value == null) {
+            return Optional.empty();
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             JsonNode valueNode = objectMapper.readTree(value);
             JsonNode payloadNode = valueNode.path("payload");
+            System.out.println(payloadNode.path("op").asText());
+            Operation operation = Operation.toOp(payloadNode.path("op").asText());
 
             T before = objectMapper
                     .treeToValue(payloadNode.path("before"), clazz);
             T after = objectMapper
                     .treeToValue(payloadNode.path("after"), clazz);
 
-            return Optional.of(new Value<>(before, after));
+            return Optional.of(new Value<>(before, after, operation));
         } catch (Exception e) {
             e.printStackTrace();
         }
